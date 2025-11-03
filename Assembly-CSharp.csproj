@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Spawner.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\MapGenerater.cs" />
+    <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRushSlash.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
     <Compile Include="Assets\Scripts\CharacterStatistics.cs" />

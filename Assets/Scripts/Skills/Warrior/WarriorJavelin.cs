@@ -3,6 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WarriorJavelin", menuName = "Scriptable Objects/WarriorJavelin")]
 public class WarriorJavelin : Skill
 {
+
+    public float length = 3.5f;
+    public float speed = 6f;
     public override void execute(Transform caster, SkillExecutor exc)
     {
         GameObject javelin = caster.transform.Find("Javelin").gameObject;
@@ -12,9 +15,9 @@ public class WarriorJavelin : Skill
 
         javel.layer = targetMask;
         javel.damage = damage;
-        javel.length = 3.5f;
+        javel.length = length;
         javel.coolDown = cooldown;
-        javel.speed = 6;
+        javel.speed = speed;
 
         javel.activate=true;
     }

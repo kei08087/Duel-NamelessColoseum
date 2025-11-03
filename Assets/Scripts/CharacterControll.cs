@@ -8,6 +8,9 @@ public class CharacterControll : MonoBehaviour
     public SkillExecutor skillExecutor;
     public Skill basicAttack;
     public Skill javelinThrow;
+    public Skill rushSlash;
+
+    public bool isDashing = false;
 
     private GameObject javelin;
 
@@ -26,7 +29,8 @@ public class CharacterControll : MonoBehaviour
         float ver = Input.GetAxisRaw("Vertical");
 
         Vector3 move = new Vector3(hor, 0, ver).normalized;
-        transform.position += move*moveSpeed*Time.deltaTime;
+        if(!isDashing)
+            transform.position += move*moveSpeed*Time.deltaTime;
         
         if(Input.GetMouseButtonDown(0)&&isReady(basicAttack))
         {
@@ -40,6 +44,11 @@ public class CharacterControll : MonoBehaviour
             javelin.transform.localEulerAngles = new Vector3(90, 90, 90);
             StartCoroutine(CastRoutine(javelinThrow));
 
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space)&&isReady(rushSlash))
+        {
+            StartCoroutine (CastRoutine(rushSlash));
         }
     }
 

@@ -8,6 +8,7 @@ public class CharacterStatistics : MonoBehaviour, IDamageable
     public float hp;
     public int basicAttack = 12;
     public float basicAttackSpeed = 1;
+    public float characterSize = 0.8f;
 
     private void Awake()
     {
