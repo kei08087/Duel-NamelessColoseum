@@ -9,12 +9,13 @@ public class CharacterControll : MonoBehaviour
     public Skill basicAttack;
     public Skill javelinThrow;
     public Skill rushSlash;
+    public Skill doubleSlash;
 
     public bool isDashing = false;
 
     private GameObject javelin;
 
-    private readonly Dictionary<string, float> coolEnd = new();
+    public readonly Dictionary<string, float> coolEnd = new();
 
     private void Awake()
     {
@@ -46,6 +47,11 @@ public class CharacterControll : MonoBehaviour
 
         }
 
+        if (Input.GetMouseButtonDown(1) && isReady(doubleSlash))
+        {
+            StartCoroutine(CastRoutine(doubleSlash));
+        }
+
         if(Input.GetKeyDown(KeyCode.Space)&&isReady(rushSlash))
         {
             StartCoroutine (CastRoutine(rushSlash));
@@ -56,7 +62,7 @@ public class CharacterControll : MonoBehaviour
     {
         if(other.gameObject==javelin)
         {
-            if(coolEnd.TryGetValue("Javelin", out float t))
+            if(coolEnd.ContainsKey("Javelin"))
             {
                 coolEnd["Javelin"] -= 5;
                 Debug.Log("Javelin Cooled down for 5 s");

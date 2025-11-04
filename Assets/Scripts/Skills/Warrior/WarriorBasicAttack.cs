@@ -10,6 +10,15 @@ public class WarriorBasicAttack : Skill
     {
         Vector3 origin = caster.transform.position;
 
-        exc.DoOverlapCone(caster, origin, radius, angle, targetMask, damage);
+        bool hitten = exc.DoOverlapCone(caster, origin, radius, angle, targetMask, damage);
+        if (hitten)
+        {
+            var chctrl = caster.gameObject.GetComponent<CharacterControll>();
+            if(chctrl.coolEnd.ContainsKey("DoubleSlash"))
+            {
+                chctrl.coolEnd["DoubleSlash"] -= 1;
+                Debug.Log("Double Slash cooldown reduced");
+            }
+        }
     }
 }
