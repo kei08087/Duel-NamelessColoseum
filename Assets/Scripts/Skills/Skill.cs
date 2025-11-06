@@ -27,6 +27,9 @@ public class Skill : ScriptableObject
     public float hitboxOn;
     public float hitboxOff;
 
+    [Header("Passive Stats")]
+    public float duration;
+
     [Header("Animations")]
     public AnimationCurve easing = AnimationCurve.EaseInOut(0, 0, 1, 1);
 

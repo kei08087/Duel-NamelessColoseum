@@ -10,6 +10,7 @@ public class CharacterControll : MonoBehaviour
     public Skill javelinThrow;
     public Skill rushSlash;
     public Skill doubleSlash;
+    public Skill recovery;
 
     public bool isDashing = false;
 
@@ -55,6 +56,11 @@ public class CharacterControll : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space)&&isReady(rushSlash))
         {
             StartCoroutine (CastRoutine(rushSlash));
+        }
+
+        if(Input.GetKeyDown(KeyCode.Q)&&isReady(recovery))
+        {
+            StartCoroutine(CastRoutine(recovery));
         }
     }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Timeline;
 
-public class CharacterStatistics : MonoBehaviour, IDamageable
+public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
 {
     public float Mhp = 100;
     public float hp;
@@ -32,6 +32,15 @@ public class CharacterStatistics : MonoBehaviour, IDamageable
         {
             Die();
         }
+    }
+
+    public void gainHealth(float amount)
+    {
+        if (hp <= 0) return;
+        else if (hp >= Mhp)
+            return;
+        hp += amount;
+        Debug.Log($"{gameObject.name} gain {amount} heal. HP = {hp}");
     }
 
     void Die()

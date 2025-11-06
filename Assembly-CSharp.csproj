@@ -65,6 +65,7 @@
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorBasicAttack.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
     <Compile Include="Assets\Scripts\Skills\Damageable.cs" />
+    <Compile Include="Assets\Scripts\Skills\Healable.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
     <Compile Include="Assets\Scripts\EventManager.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Assets\Scripts\MapGenerater.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorDoubleSlash.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRushSlash.cs" />
+    <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRecoverHealth.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
     <Compile Include="Assets\Scripts\CharacterStatistics.cs" />
