@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Timeline;
@@ -10,6 +12,8 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
     public float basicAttackSpeed = 1;
     public float characterSize = 0.8f;
 
+    readonly List<IDamageProcess> _modifiers = new();
+
     private void Awake()
     {
         hp = Mhp;
@@ -17,17 +21,43 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
 
     public void TakeDamage(float amount)
     {
-        // 이미 죽었다면 무시
-        if (hp <= 0) return;
+       DamageBlock dmgB = new DamageBlock();
+        dmgB.damage = amount;
+        dmgB.finalDamage = 0;
+        dmgB.blocked = false;
+        dmgB.otherCase = false;
+        dmgB.attacker = null;
+        TakeDamage(dmgB);
+    }
 
-        hp -= amount;
-        Debug.Log($"{gameObject.name} took {amount} damage! HP = {hp}");
+    public void assignModifier(IDamageProcess dmgProcess)
+    {
+        _modifiers.Add(dmgProcess);
+        _modifiers.Sort((a,b)=>a.priority.CompareTo(b.priority));
+    }
 
-        // 피격 피드백
+    public void unassignModifier(IDamageProcess dmgProcess)
+    {
+        _modifiers.Remove(dmgProcess);
+    }
 
+    public void TakeDamage(DamageBlock dmgB)
+    {
+        if(hp<= 0) return;
 
+        foreach (var m in _modifiers)
+        {
+            m.preprocess( ref dmgB, this);
+        }
+        if (dmgB.damage <= 0)
+            dmgB.finalDamage = 0;
+        else
+            dmgB.finalDamage = dmgB.damage;
 
-        // HP가 0 이하 → 사망 처리
+        if(!dmgB.blocked)
+            hp -= dmgB.finalDamage;
+        Debug.Log($"{gameObject.name} took {dmgB.finalDamage} damage! HP = {hp}");
+
         if (hp <= 0)
         {
             Die();
@@ -37,8 +67,12 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
     public void gainHealth(float amount)
     {
         if (hp <= 0) return;
-        else if (hp >= Mhp)
-            return;
+        if(hp==Mhp)
+        {
+            amount = 0;
+        }
+        else if (hp + amount >= Mhp)
+            amount = hp + amount - Mhp;
         hp += amount;
         Debug.Log($"{gameObject.name} gain {amount} heal. HP = {hp}");
     }

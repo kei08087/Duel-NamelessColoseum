@@ -62,12 +62,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\CharacterControll.cs" />
+    <Compile Include="Assets\Scripts\Skills\Warrior\WarriorShieldUp.cs" />
+    <Compile Include="Assets\Scripts\Skills\DamageProcess.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorBasicAttack.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
     <Compile Include="Assets\Scripts\Skills\Damageable.cs" />
     <Compile Include="Assets\Scripts\Skills\Healable.cs" />
+    <Compile Include="Assets\Scripts\Skills\DamageBlock.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
     <Compile Include="Assets\Scripts\EventManager.cs" />
+    <Compile Include="Assets\Scripts\Skills\DebugingSkill_SelfDamage.cs" />
+    <Compile Include="Assets\Scripts\Skills\ReduceDamage.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
     <Compile Include="Assets\Scripts\CharacterEnum.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\Javelin.cs" />

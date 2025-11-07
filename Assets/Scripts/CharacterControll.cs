@@ -11,6 +11,7 @@ public class CharacterControll : MonoBehaviour
     public Skill rushSlash;
     public Skill doubleSlash;
     public Skill recovery;
+    public Skill shieldUp;
 
     public bool isDashing = false;
 
@@ -62,7 +63,22 @@ public class CharacterControll : MonoBehaviour
         {
             StartCoroutine(CastRoutine(recovery));
         }
+
+        if(Input.GetKeyDown(KeyCode.E)&&isReady(shieldUp))
+        {
+            StartCoroutine(CastRoutine(shieldUp));
+        }
+
+#if DEBUG
+        if(Input.GetMouseButtonDown(2))
+        {
+            Skill debugSkill = ScriptableObject.CreateInstance<DebugingSkill_SelfDamage>();
+            debugSkill.damage = 5;
+            debugSkill.skillID = "debug, selfAttack";
+            StartCoroutine(CastRoutine(debugSkill));
+        }
     }
+#endif
 
     private void OnTriggerEnter(Collider other)
     {
