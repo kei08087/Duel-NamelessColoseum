@@ -6,12 +6,7 @@ public class CharacterControll : MonoBehaviour
 {
     public float moveSpeed = 1.0f;
     public SkillExecutor skillExecutor;
-    public Skill basicAttack;
-    public Skill javelinThrow;
-    public Skill rushSlash;
-    public Skill doubleSlash;
-    public Skill recovery;
-    public Skill shieldUp;
+    public SkillsetBase skillSet;
 
     public bool isDashing = false;
 
@@ -35,38 +30,43 @@ public class CharacterControll : MonoBehaviour
         if(!isDashing)
             transform.position += move*moveSpeed*Time.deltaTime;
         
-        if(Input.GetMouseButtonDown(0)&&isReady(basicAttack))
+        if(Input.GetMouseButtonDown(0)&&isReady(skillSet.LeftClick))
         {
-            StartCoroutine(CastRoutine(basicAttack));
+            StartCoroutine(CastRoutine(skillSet.LeftClick));
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift)&&isReady(javelinThrow))
+        if (Input.GetKeyDown(KeyCode.LeftShift)&&isReady(skillSet.LShift))
         {
             
             javelin.transform.localPosition = new Vector3(0.6f, 0.5f, 0);
             javelin.transform.localEulerAngles = new Vector3(90, 90, 90);
-            StartCoroutine(CastRoutine(javelinThrow));
+            StartCoroutine(CastRoutine(skillSet.LShift));
 
         }
 
-        if (Input.GetMouseButtonDown(1) && isReady(doubleSlash))
+        if (Input.GetMouseButtonDown(1) && isReady(skillSet.RightClick))
         {
-            StartCoroutine(CastRoutine(doubleSlash));
+            StartCoroutine(CastRoutine(skillSet.RightClick));
         }
 
-        if(Input.GetKeyDown(KeyCode.Space)&&isReady(rushSlash))
+        if(Input.GetKeyDown(KeyCode.Space)&&isReady(skillSet.Space))
         {
-            StartCoroutine (CastRoutine(rushSlash));
+            StartCoroutine (CastRoutine(skillSet.Space));
         }
 
-        if(Input.GetKeyDown(KeyCode.Q)&&isReady(recovery))
+        if(Input.GetKeyDown(KeyCode.Q)&&isReady(skillSet.QSkill))
         {
-            StartCoroutine(CastRoutine(recovery));
+            StartCoroutine(CastRoutine(skillSet.QSkill));
         }
 
-        if(Input.GetKeyDown(KeyCode.E)&&isReady(shieldUp))
+        if(Input.GetKeyDown(KeyCode.E)&&isReady(skillSet.ESkill))
         {
-            StartCoroutine(CastRoutine(shieldUp));
+            StartCoroutine(CastRoutine(skillSet.ESkill));
+        }
+
+        if(Input.GetKeyDown(KeyCode.LeftControl)&&isReady(skillSet.LCtrl))
+        {
+            StartCoroutine(CastRoutine(skillSet.LCtrl));
         }
 
 #if DEBUG
