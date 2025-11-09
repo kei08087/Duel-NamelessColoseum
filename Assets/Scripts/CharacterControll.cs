@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class CharacterControll : MonoBehaviour
 {
-    public float moveSpeed = 1.0f;
     public SkillExecutor skillExecutor;
     public SkillsetBase skillSet;
+    public CharacterStatistics chstats;
 
     public bool isDashing = false;
 
@@ -18,6 +18,8 @@ public class CharacterControll : MonoBehaviour
     {
         if(skillExecutor == null)
             skillExecutor = GetComponent<SkillExecutor>();
+        if(chstats == null)
+            chstats = GetComponent<CharacterStatistics>();
         javelin = transform.Find("Javelin").gameObject;
     }
     // Update is called once per frame
@@ -28,7 +30,7 @@ public class CharacterControll : MonoBehaviour
 
         Vector3 move = new Vector3(hor, 0, ver).normalized;
         if(!isDashing)
-            transform.position += move*moveSpeed*Time.deltaTime;
+            chstats.Move(move);
         
         if(Input.GetMouseButtonDown(0)&&isReady(skillSet.LeftClick))
         {

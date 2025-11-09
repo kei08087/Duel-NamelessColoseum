@@ -5,10 +5,11 @@ public class ReduceDamage : ScriptableObject, IDamageProcess
 {
     public int priority => 1;
     public float reducing;
+    public string skillName;
 
     public void preprocess(ref DamageBlock dmgB, CharacterStatistics chstats)
     {
-        Debug.Log($"Effect of ShieldUp, {reducing} damage was reduced from {dmgB.damage}");
+        Debug.Log($"Effect of {skillName}, {reducing} damage was reduced from {dmgB.damage}");
         dmgB.damage -= reducing;
     }
 

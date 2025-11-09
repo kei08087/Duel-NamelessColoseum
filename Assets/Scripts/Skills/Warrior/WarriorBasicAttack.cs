@@ -10,7 +10,7 @@ public class WarriorBasicAttack : Skill
     {
         Vector3 origin = caster.transform.position;
 
-        bool hitten = exc.DoOverlapCone(caster, origin, radius, angle, targetMask, damage);
+        GameObject hitten = exc.DoOverlapCone(caster, origin, radius, angle, targetMask, damage);
         if (hitten)
         {
             var chctrl = caster.gameObject.GetComponent<CharacterControll>();

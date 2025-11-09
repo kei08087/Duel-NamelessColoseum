@@ -83,7 +83,7 @@ public class Skill : ScriptableObject
 
         var chctrl = caster.gameObject.GetComponent<CharacterControll>();
         chctrl.isDashing = true;
-        bool hitten = false;
+        GameObject hitten = null;
 
         while (t < delayBack)
         {

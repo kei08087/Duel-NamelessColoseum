@@ -61,19 +61,21 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.61f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Skills\SkillInterfaces\DamageProcess.cs" />
     <Compile Include="Assets\Scripts\CharacterControll.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorShieldUp.cs" />
-    <Compile Include="Assets\Scripts\Skills\DamageProcess.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Damageable.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorBasicAttack.cs" />
+    <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceSpeed.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillsetBase.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
-    <Compile Include="Assets\Scripts\Skills\Damageable.cs" />
-    <Compile Include="Assets\Scripts\Skills\Healable.cs" />
     <Compile Include="Assets\Scripts\Skills\DamageBlock.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
     <Compile Include="Assets\Scripts\EventManager.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillInterfaces\MoveProcess.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Moveable.cs" />
     <Compile Include="Assets\Scripts\Skills\DebugingSkill_SelfDamage.cs" />
-    <Compile Include="Assets\Scripts\Skills\ReduceDamage.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Healable.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
     <Compile Include="Assets\Scripts\CharacterEnum.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\Javelin.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRecoverHealth.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
+    <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceDamage.cs" />
     <Compile Include="Assets\Scripts\CharacterStatistics.cs" />
     <Compile Include="Assets\Scripts\MapEnum.cs" />
   </ItemGroup>

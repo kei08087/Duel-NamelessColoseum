@@ -17,6 +17,7 @@ public class WarriorShieldUp : Skill
         var template = processType ? ScriptableObject.Instantiate(processType) : ScriptableObject.CreateInstance<ReduceDamage>();
 
         template.reducing=damage;
+        template.skillName = skillID;
         chstats.assignModifier(template);
         yield return new WaitForSeconds(duration);
         chstats.unassignModifier(template);

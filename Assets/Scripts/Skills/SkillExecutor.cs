@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SkillExecutor : MonoBehaviour
 {
-    public bool DoOverlapCone(Transform caster, Vector3 center, float radius, float angle, LayerMask mask, float damage)
+    public GameObject DoOverlapCone(Transform caster, Vector3 center, float radius, float angle, LayerMask mask, float damage)
     {
         DrawConeGizmo(caster, radius, angle, 0.5f);
         //var hits = Physics.OverlapSphere(center, radius, mask, QueryTriggerInteraction.Collide);
@@ -32,10 +32,10 @@ public class SkillExecutor : MonoBehaviour
                 if (hit.TryGetComponent<IDamageable>(out var d))
                 {
                     d.TakeDamage(damage);
-                    return true;
+                    return hit.gameObject;
                 }
         }
-        return false;
+        return null;
     }
 
     public static void DrawConeGizmo(Transform caster, float radius, float angle, float duration = 0.1f)

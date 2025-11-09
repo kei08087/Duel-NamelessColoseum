@@ -4,19 +4,34 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Timeline;
 
-public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
+public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMoveable
 {
     public float Mhp = 100;
     public float hp;
     public int basicAttack = 12;
     public float basicAttackSpeed = 1;
     public float characterSize = 0.8f;
+    public float moveSpeed;
+    public float instanceSpeed;
 
-    readonly List<IDamageProcess> _modifiers = new();
+    readonly List<IDamageProcess> _damageModifiers = new();
+    readonly List<IMoveProcess> _moveModifiers = new();
 
     private void Awake()
     {
         hp = Mhp;
+        
+    }
+
+    private void Update()
+    {
+        instanceSpeed = moveSpeed;
+        foreach (var m in _moveModifiers)
+        {
+            m.preprocess(ref instanceSpeed, this);
+        }
+        if (instanceSpeed <= 0)
+            instanceSpeed = 0;
     }
 
     public void TakeDamage(float amount)
@@ -32,20 +47,31 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
 
     public void assignModifier(IDamageProcess dmgProcess)
     {
-        _modifiers.Add(dmgProcess);
-        _modifiers.Sort((a,b)=>a.priority.CompareTo(b.priority));
+        _damageModifiers.Add(dmgProcess);
+        _damageModifiers.Sort((a,b)=>a.priority.CompareTo(b.priority));
+    }
+
+    public void assignModifier(IMoveProcess mvProcess)
+    {
+        _moveModifiers.Add(mvProcess);
+        _moveModifiers.Sort((a, b)=>a.priority.CompareTo(b.priority));
     }
 
     public void unassignModifier(IDamageProcess dmgProcess)
     {
-        _modifiers.Remove(dmgProcess);
+        _damageModifiers.Remove(dmgProcess);
+    }
+
+    public void unassignModifier(IMoveProcess mvProcess)
+    {
+        _moveModifiers.Remove(mvProcess);
     }
 
     public void TakeDamage(DamageBlock dmgB)
     {
         if(hp<= 0) return;
 
-        foreach (var m in _modifiers)
+        foreach (var m in _damageModifiers)
         {
             m.preprocess( ref dmgB, this);
         }
@@ -75,6 +101,19 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable
             amount = hp + amount - Mhp;
         hp += amount;
         Debug.Log($"{gameObject.name} gain {amount} heal. HP = {hp}");
+    }
+
+    public void Move(Vector3 dir)
+    {
+        //instanceSpeed = moveSpeed;
+        //foreach(var  m in _moveModifiers)
+        //{
+        //    m.preprocess( ref instanceSpeed, this);
+        //}
+        //if(instanceSpeed<=0)
+        //    instanceSpeed = 0;
+
+        transform.position += dir*instanceSpeed*Time.deltaTime;
     }
 
     void Die()
