@@ -4,26 +4,40 @@ using UnityEngine;
 public class SkillsetBase : ScriptableObject
 {
     public Skill LeftClickSO;
-    public Skill LeftClick;
     public Skill RightClickSO;
-    public Skill RightClick;
     public int RCLevel;
     public Skill QSkillSO;
-    public Skill QSkill;
     public int QLevel;
     public Skill ESkillSO;
-    public Skill ESkill;
     public int ELevel;
     public Skill LShiftSO;
-    public Skill LShift;
     public int LSLevel;
     public Skill SpaceSO;
-    public Skill Space;
     public int SLevel;
     public Skill LCtrlSO;
-    public Skill LCtrl;
     public int LCtrlLevel;
 
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill LeftClick;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill RightClick;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill QSkill;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill ESkill;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill LShift;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill Space;
+    [HideInInspector]
+    [System.NonSerialized]
+    public Skill LCtrl;
 
 
     public void OnEnable()
