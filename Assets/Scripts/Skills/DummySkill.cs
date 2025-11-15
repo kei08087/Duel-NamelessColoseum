@@ -1,13 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DebugingSkill_SelfDamage", menuName = "Scriptable Objects/DebugingSkill_SelfDamage")]
-public class DebugingSkill_SelfDamage : Skill
+[CreateAssetMenu(fileName = "DummySkill", menuName = "Scriptable Objects/DummySkill")]
+public class DummySkill : Skill
 {
     [System.Serializable]
     public class SkillStructure
     {
         public basicModule basicMd;
-        public damageModule damageMd;
     }
 
     public SkillStructure[] skillStructures = new SkillStructure[1];
@@ -20,7 +19,6 @@ public class DebugingSkill_SelfDamage : Skill
 
     public override void execute(Transform caster, SkillExecutor exc)
     {
-        caster.gameObject.GetComponent<CharacterStatistics>().TakeDamage(skillStructures[0].damageMd.damage);
+        Debug.Log("Empty Skill");
     }
-    
 }

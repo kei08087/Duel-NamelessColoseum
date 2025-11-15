@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\DamageProcess.cs" />
+    <Compile Include="Assets\Scripts\Skills\DummySkill.cs" />
     <Compile Include="Assets\Scripts\CharacterControll.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorShieldUp.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Damageable.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Assets\Scripts\Skills\DebugingSkill_SelfDamage.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Healable.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillStructures.cs" />
     <Compile Include="Assets\Scripts\CharacterEnum.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\Javelin.cs" />
     <Compile Include="Assets\Scripts\Spawner.cs" />

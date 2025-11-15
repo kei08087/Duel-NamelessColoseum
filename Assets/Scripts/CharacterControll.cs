@@ -74,8 +74,25 @@ public class CharacterControll : MonoBehaviour
 #if DEBUG
         if(Input.GetMouseButtonDown(2))
         {
-            Skill debugSkill = ScriptableObject.CreateInstance<DebugingSkill_SelfDamage>();
-            debugSkill.damage = 5;
+            DebugingSkill_SelfDamage debugSkill = ScriptableObject.CreateInstance<DebugingSkill_SelfDamage>();
+
+            // 배열이 null일 수도 있으므로 방어적으로 초기화
+            if (debugSkill.skillStructures == null || debugSkill.skillStructures.Length == 0)
+                debugSkill.skillStructures = new DebugingSkill_SelfDamage.SkillStructure[1];
+
+            // 0번째 요소 생성
+            if (debugSkill.skillStructures[0] == null)
+                debugSkill.skillStructures[0] = new DebugingSkill_SelfDamage.SkillStructure();
+
+            // damageModule도 생성
+            if (debugSkill.skillStructures[0].damageMd == null)
+                debugSkill.skillStructures[0].damageMd = new damageModule();
+
+            if (debugSkill.skillStructures[0].basicMd == null)
+                debugSkill.skillStructures[0].basicMd = new basicModule();
+
+
+            debugSkill.skillStructures[0].damageMd.damage = 5;
             debugSkill.skillID = "debug, selfAttack";
             StartCoroutine(CastRoutine(debugSkill));
         }
@@ -104,9 +121,10 @@ public class CharacterControll : MonoBehaviour
     IEnumerator CastRoutine(Skill s)
     {
         Debug.Log("Skill used: "+s.skillID);
-        if(s.delayFront>0f)
-            yield return new WaitForSeconds(s.delayFront);
+        Debug.Log("Skill Level: "+s.skillLevel);
+        if(s.basic.delayFront>0f)
+            yield return new WaitForSeconds(s.basic.delayFront);
         s.execute(transform,skillExecutor);
-        coolEnd[s.skillID] = Time.time + s.cooldown;
+        coolEnd[s.skillID] = Time.time + s.basic.cooldown;
     }
 }

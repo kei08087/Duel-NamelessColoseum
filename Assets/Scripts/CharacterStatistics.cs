@@ -97,7 +97,7 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
         {
             amount = 0;
         }
-        else if (hp + amount >= Mhp)
+        else if (hp + amount > Mhp)
             amount = hp + amount - Mhp;
         hp += amount;
         Debug.Log($"{gameObject.name} gain {amount} heal. HP = {hp}");
