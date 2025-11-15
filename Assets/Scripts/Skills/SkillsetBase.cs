@@ -3,17 +3,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SkillsetBase", menuName = "Scriptable Objects/SkillsetBase")]
 public class SkillsetBase : ScriptableObject
 {
+    public Skill LeftClickSO;
     public Skill LeftClick;
+    public Skill RightClickSO;
     public Skill RightClick;
     public int RCLevel;
+    public Skill QSkillSO;
     public Skill QSkill;
     public int QLevel;
+    public Skill ESkillSO;
     public Skill ESkill;
     public int ELevel;
+    public Skill LShiftSO;
     public Skill LShift;
     public int LSLevel;
+    public Skill SpaceSO;
     public Skill Space;
     public int SLevel;
+    public Skill LCtrlSO;
     public Skill LCtrl;
     public int LCtrlLevel;
 
@@ -21,18 +28,18 @@ public class SkillsetBase : ScriptableObject
 
     public void OnEnable()
     {
-        if (LeftClick != null)
+        if (LeftClickSO != null)
         {
-            LeftClick = ScriptableObject.Instantiate(LeftClick);
+            LeftClick = ScriptableObject.Instantiate(LeftClickSO);
         }
         else
         {
             LeftClick = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (RightClick != null && RCLevel != 0)
+        if (RightClickSO != null && RCLevel != 0)
         {
-            RightClick = ScriptableObject.Instantiate(RightClick);
+            RightClick = ScriptableObject.Instantiate(RightClickSO);
             RightClick.skillLevel = RCLevel - 1;
             RightClick.init();
         }
@@ -41,9 +48,9 @@ public class SkillsetBase : ScriptableObject
             RightClick = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (QSkill != null && QLevel != 0)
+        if (QSkillSO != null && QLevel != 0)
         {
-            QSkill = ScriptableObject.Instantiate(QSkill);
+            QSkill = ScriptableObject.Instantiate(QSkillSO);
             QSkill.skillLevel = QLevel - 1;
             QSkill.init();
         }
@@ -52,9 +59,9 @@ public class SkillsetBase : ScriptableObject
             QSkill = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (ESkill != null && ELevel != 0)
+        if (ESkillSO != null && ELevel != 0)
         {
-            ESkill = ScriptableObject.Instantiate(ESkill);
+            ESkill = ScriptableObject.Instantiate(ESkillSO);
             ESkill.skillLevel = ELevel - 1;
             ESkill.init();
         }
@@ -63,9 +70,9 @@ public class SkillsetBase : ScriptableObject
             ESkill = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (LShift != null && LSLevel != 0)
+        if (LShiftSO != null && LSLevel != 0)
         {
-            LShift = ScriptableObject.Instantiate(LShift);
+            LShift = ScriptableObject.Instantiate(LShiftSO);
             LShift.skillLevel = LSLevel - 1;
             LShift.init();
         }
@@ -74,9 +81,9 @@ public class SkillsetBase : ScriptableObject
             LShift = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (Space != null && SLevel != 0)
+        if (SpaceSO != null && SLevel != 0)
         {
-            Space = ScriptableObject.Instantiate(Space);
+            Space = ScriptableObject.Instantiate(SpaceSO);
             Space.skillLevel = SLevel - 1;
             Space.init();
         }
@@ -85,9 +92,9 @@ public class SkillsetBase : ScriptableObject
             Space = ScriptableObject.CreateInstance<DummySkill>();
         }
 
-        if (LCtrl != null && LCtrlLevel != 0)
+        if (LCtrlSO != null && LCtrlLevel != 0)
         {
-            LCtrl = ScriptableObject.Instantiate(LCtrl);
+            LCtrl = ScriptableObject.Instantiate(LCtrlSO);
             LCtrl.skillLevel = LCtrlLevel - 1;
             LCtrl.init();
         }

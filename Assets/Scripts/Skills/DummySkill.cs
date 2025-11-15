@@ -12,6 +12,8 @@ public class DummySkill : Skill
     public SkillStructure[] skillStructures = new SkillStructure[1];
     public override basicModule basic => skillStructures[0].basicMd;
 
+
+
     public override void init()
     {
         
