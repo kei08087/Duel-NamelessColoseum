@@ -4,6 +4,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameObject player;
+    public GameObject enemy;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
@@ -28,5 +29,9 @@ public class GameManager : MonoBehaviour
     public void RegisterPlayer(GameObject player)
     {
         this.player = player;
+    }
+    public void RegisterEnemy(GameObject enemy)
+    {
+        this.enemy = enemy;
     }
 }

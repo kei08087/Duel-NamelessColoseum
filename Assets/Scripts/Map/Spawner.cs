@@ -20,6 +20,9 @@ public class Spawner : MonoBehaviour
         GameObject player = Instantiate(character, transform.position, transform.rotation);
         if(isPlayer) 
             GameManager.Instance.RegisterPlayer(player);
+        else
+            GameManager.Instance.RegisterEnemy(player);
+        EventManager.PlayerUIConnection(player, isPlayer);
     }
 
 

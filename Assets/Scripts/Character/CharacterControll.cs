@@ -20,7 +20,7 @@ public class CharacterControll : MonoBehaviour
             skillExecutor = GetComponent<SkillExecutor>();
         if(chstats == null)
             chstats = GetComponent<CharacterStatistics>();
-        javelin = transform.Find("Javelin").gameObject;
+        javelin = transform.Find("Player/Javelin").gameObject;
     }
     // Update is called once per frame
     void Update()
@@ -32,43 +32,43 @@ public class CharacterControll : MonoBehaviour
         if(!isDashing)
             chstats.Move(move);
         
-        if(Input.GetMouseButtonDown(0)&&isReady(skillSet.LeftClick))
+        if(Input.GetMouseButtonDown(0)&&isReady(skillSet.LeftClick,"LClick"))
         {
-            StartCoroutine(CastRoutine(skillSet.LeftClick));
+            StartCoroutine(CastRoutine(skillSet.LeftClick,"LClick"));
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift)&&isReady(skillSet.LShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift)&&isReady(skillSet.LShift,"LShift"))
         {
             
             javelin.transform.localPosition = new Vector3(0.6f, 0.5f, 0);
             javelin.transform.localEulerAngles = new Vector3(90, 90, 90);
-            StartCoroutine(CastRoutine(skillSet.LShift));
+            StartCoroutine(CastRoutine(skillSet.LShift,"LShift"));
 
         }
 
-        if (Input.GetMouseButtonDown(1) && isReady(skillSet.RightClick))
+        if (Input.GetMouseButtonDown(1) && isReady(skillSet.RightClick,"RClick"))
         {
-            StartCoroutine(CastRoutine(skillSet.RightClick));
+            StartCoroutine(CastRoutine(skillSet.RightClick,"RClick"));
         }
 
-        if(Input.GetKeyDown(KeyCode.Space)&&isReady(skillSet.Space))
+        if(Input.GetKeyDown(KeyCode.Space)&&isReady(skillSet.Space,"Space"))
         {
-            StartCoroutine (CastRoutine(skillSet.Space));
+            StartCoroutine (CastRoutine(skillSet.Space,"Space"));
         }
 
-        if(Input.GetKeyDown(KeyCode.Q)&&isReady(skillSet.QSkill))
+        if(Input.GetKeyDown(KeyCode.Q)&&isReady(skillSet.QSkill,"Q"))
         {
-            StartCoroutine(CastRoutine(skillSet.QSkill));
+            StartCoroutine(CastRoutine(skillSet.QSkill,"Q"));
         }
 
-        if(Input.GetKeyDown(KeyCode.E)&&isReady(skillSet.ESkill))
+        if(Input.GetKeyDown(KeyCode.E)&&isReady(skillSet.ESkill,"E"))
         {
-            StartCoroutine(CastRoutine(skillSet.ESkill));
+            StartCoroutine(CastRoutine(skillSet.ESkill,"E"));
         }
 
-        if(Input.GetKeyDown(KeyCode.LeftControl)&&isReady(skillSet.LCtrl))
+        if(Input.GetKeyDown(KeyCode.LeftControl)&&isReady(skillSet.LCtrl,"LCtrl"))
         {
-            StartCoroutine(CastRoutine(skillSet.LCtrl));
+            StartCoroutine(CastRoutine(skillSet.LCtrl, "LCtrl"));
         }
 
 #if DEBUG
@@ -94,7 +94,7 @@ public class CharacterControll : MonoBehaviour
 
             debugSkill.skillStructures[0].damageMd.damage = 5;
             debugSkill.skillID = "debug, selfAttack";
-            StartCoroutine(CastRoutine(debugSkill));
+            StartCoroutine(CastRoutine(debugSkill, "Debug"));
         }
     }
 #endif
@@ -103,28 +103,28 @@ public class CharacterControll : MonoBehaviour
     {
         if(other.gameObject==javelin)
         {
-            if(coolEnd.ContainsKey("Javelin"))
+            if(coolEnd.ContainsKey("LShift"))
             {
-                coolEnd["Javelin"] -= 5;
+                coolEnd["LShift"] -= 5;
                 Debug.Log("Javelin Cooled down for 5 s");
             }
         }
     }
 
-    bool isReady(Skill s)
+    bool isReady(Skill s, string skillSlot)
     {
-        if (!coolEnd.TryGetValue(s.skillID, out float t))
+        if (!coolEnd.TryGetValue(skillSlot, out float t))
             return true;
         return Time.time >= t;
     }
 
-    IEnumerator CastRoutine(Skill s)
+    IEnumerator CastRoutine(Skill s, string skillSlot)
     {
         Debug.Log("Skill used: "+s.skillID);
         Debug.Log("Skill Level: "+s.skillLevel);
         if(s.basic.delayFront>0f)
             yield return new WaitForSeconds(s.basic.delayFront);
         s.execute(transform,skillExecutor);
-        coolEnd[s.skillID] = Time.time + s.basic.cooldown;
+        coolEnd[skillSlot] = Time.time + s.basic.cooldown;
     }
 }

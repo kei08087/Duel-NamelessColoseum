@@ -61,29 +61,31 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.61f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Character\CharacterEnum.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\DamageProcess.cs" />
     <Compile Include="Assets\Scripts\Skills\DummySkill.cs" />
-    <Compile Include="Assets\Scripts\CharacterControll.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorShieldUp.cs" />
+    <Compile Include="Assets\Scripts\Character\CharacterStatistics.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Damageable.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorBasicAttack.cs" />
     <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceSpeed.cs" />
+    <Compile Include="Assets\Scripts\Map\Spawner.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillsetBase.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
     <Compile Include="Assets\Scripts\Skills\DamageBlock.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
     <Compile Include="Assets\Scripts\EventManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\MoveProcess.cs" />
+    <Compile Include="Assets\Scripts\UI\HPUI.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Moveable.cs" />
     <Compile Include="Assets\Scripts\Skills\DebugingSkill_SelfDamage.cs" />
+    <Compile Include="Assets\Scripts\Map\MapEnum.cs" />
+    <Compile Include="Assets\Scripts\Character\CharacterControll.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Healable.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillStructures.cs" />
-    <Compile Include="Assets\Scripts\CharacterEnum.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\Javelin.cs" />
-    <Compile Include="Assets\Scripts\Spawner.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Scripts\MapGenerater.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorSmite.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorDoubleSlash.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRushSlash.cs" />
@@ -91,8 +93,32 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
     <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceDamage.cs" />
-    <Compile Include="Assets\Scripts\CharacterStatistics.cs" />
-    <Compile Include="Assets\Scripts\MapEnum.cs" />
+    <Compile Include="Assets\Scripts\Map\MapGenerater.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
