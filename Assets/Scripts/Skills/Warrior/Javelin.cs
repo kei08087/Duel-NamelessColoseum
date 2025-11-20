@@ -59,6 +59,7 @@ public class Javelin : MonoBehaviour
         {
             landed = false;
             returnParent();
+            parent.GetComponentInParent<CharacterControll>().coolDownEffect("LShift", 5);
         }
     }
 

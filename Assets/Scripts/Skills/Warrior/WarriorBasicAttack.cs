@@ -29,11 +29,7 @@ public class WarriorBasicAttack : Skill
         if (hitten)
         {
             var chctrl = caster.gameObject.GetComponent<CharacterControll>();
-            if(chctrl.coolEnd.ContainsKey("RClick"))
-            {
-                chctrl.coolEnd["RClick"] -= 1;
-                Debug.Log("Double Slash cooldown reduced");
-            }
+            chctrl.coolDownEffect("RClick", 1);
         }
     }
 }

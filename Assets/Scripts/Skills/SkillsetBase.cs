@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SkillsetBase", menuName = "Scriptable Objects/SkillsetBase")]
@@ -39,6 +40,7 @@ public class SkillsetBase : ScriptableObject
     [System.NonSerialized]
     public Skill LCtrl;
 
+    private Dictionary<string, Skill> skillDict = new();
 
     public void OnEnable()
     {
@@ -50,6 +52,7 @@ public class SkillsetBase : ScriptableObject
         {
             LeftClick = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["LClick"] = LeftClick;
 
         if (RightClickSO != null && RCLevel != 0)
         {
@@ -61,6 +64,7 @@ public class SkillsetBase : ScriptableObject
         {
             RightClick = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["RClick"] = RightClick;
 
         if (QSkillSO != null && QLevel != 0)
         {
@@ -72,6 +76,7 @@ public class SkillsetBase : ScriptableObject
         {
             QSkill = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["Q"] = QSkill;
 
         if (ESkillSO != null && ELevel != 0)
         {
@@ -83,6 +88,7 @@ public class SkillsetBase : ScriptableObject
         {
             ESkill = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["E"]  = ESkill;
 
         if (LShiftSO != null && LSLevel != 0)
         {
@@ -94,6 +100,7 @@ public class SkillsetBase : ScriptableObject
         {
             LShift = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["LShift"] = LShift;
 
         if (SpaceSO != null && SLevel != 0)
         {
@@ -105,6 +112,7 @@ public class SkillsetBase : ScriptableObject
         {
             Space = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["Space"] = Space;
 
         if (LCtrlSO != null && LCtrlLevel != 0)
         {
@@ -116,6 +124,15 @@ public class SkillsetBase : ScriptableObject
         {
             LCtrl = ScriptableObject.CreateInstance<DummySkill>();
         }
+        skillDict["LCtrl"] = LCtrl;
+    }
+
+    public Skill getSkill(string skillSlot)
+    {
+        if(skillDict.TryGetValue(skillSlot, out Skill s))
+            return s;
+        Debug.Log("Null Retrun3d");
+        return null;
     }
 
 }

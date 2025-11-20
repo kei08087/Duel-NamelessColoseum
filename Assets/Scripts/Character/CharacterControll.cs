@@ -99,17 +99,7 @@ public class CharacterControll : MonoBehaviour
     }
 #endif
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject==javelin)
-        {
-            if(coolEnd.ContainsKey("LShift"))
-            {
-                coolEnd["LShift"] -= 5;
-                Debug.Log("Javelin Cooled down for 5 s");
-            }
-        }
-    }
+
 
     bool isReady(Skill s, string skillSlot)
     {
@@ -126,5 +116,14 @@ public class CharacterControll : MonoBehaviour
             yield return new WaitForSeconds(s.basic.delayFront);
         s.execute(transform,skillExecutor);
         coolEnd[skillSlot] = Time.time + s.basic.cooldown;
+    }
+
+    public void coolDownEffect(string skillSlot, float amount)
+    {
+        if (coolEnd.ContainsKey(skillSlot))
+        {
+            coolEnd[skillSlot] -= amount;
+            Debug.Log($"{skillSet.getSkill(skillSlot).skillID} cooldown reduced");
+        }
     }
 }

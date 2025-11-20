@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\Skills\DebugingSkill_SelfDamage.cs" />
     <Compile Include="Assets\Scripts\Map\MapEnum.cs" />
     <Compile Include="Assets\Scripts\Character\CharacterControll.cs" />
+    <Compile Include="Assets\Scripts\UI\SkillUI.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Healable.cs" />
     <Compile Include="Assets\Scripts\PlayerCamera.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillStructures.cs" />
