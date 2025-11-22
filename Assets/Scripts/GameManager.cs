@@ -5,26 +5,26 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public GameObject player;
     public GameObject enemy;
+
+    private SkillsetBase playerSkillset;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        playerSkillset = SceneManagering.Instance.playerSkillset;
+        EventManager.GameSet();
+        EventManager.SpawnPlayer(playerSkillset);
+        EventManager.SetCamera(player);
     }
 
-    // Update is called once per frame
-    bool GameStart = false;
-    void Update()
+    private void OnDestroy()
     {
-        if (!GameStart)
-        {
-            GameStart= true;
-            EventManager.GameSet();
-            EventManager.SpawnPlayer();
-            EventManager.SetCamera(player);
-        }
+        if(Instance==this)
+            Instance = null;
     }
+
 
     public void RegisterPlayer(GameObject player)
     {

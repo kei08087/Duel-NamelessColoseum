@@ -24,7 +24,7 @@ public class WarriorJavelin : Skill
     public override void execute(Transform caster, SkillExecutor exc)
     {
         
-        GameObject javelin = caster.transform.Find("Player/Javelin").gameObject;
+        GameObject javelin = caster.transform.Find("Javelin").gameObject;
         Javelin javel = javelin.GetComponent<Javelin>();
         javel.parent = javelin.transform.parent.gameObject;
         javelin.transform.SetParent(null,true);

@@ -42,7 +42,7 @@ public class SkillsetBase : ScriptableObject
 
     private Dictionary<string, Skill> skillDict = new();
 
-    public void OnEnable()
+    public void init()
     {
         if (LeftClickSO != null)
         {
@@ -131,7 +131,7 @@ public class SkillsetBase : ScriptableObject
     {
         if(skillDict.TryGetValue(skillSlot, out Skill s))
             return s;
-        Debug.Log("Null Retrun3d");
+        Debug.Log("Null Retruned");
         return null;
     }
 

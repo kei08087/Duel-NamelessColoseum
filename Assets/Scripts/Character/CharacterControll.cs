@@ -5,8 +5,11 @@ using UnityEngine;
 public class CharacterControll : MonoBehaviour
 {
     public SkillExecutor skillExecutor;
-    public SkillsetBase skillSet;
+    
     public CharacterStatistics chstats;
+
+    [SerializeField]
+    public SkillsetBase skillSet;
 
     public bool isDashing = false;
 
@@ -20,7 +23,7 @@ public class CharacterControll : MonoBehaviour
             skillExecutor = GetComponent<SkillExecutor>();
         if(chstats == null)
             chstats = GetComponent<CharacterStatistics>();
-        javelin = transform.Find("Player/Javelin").gameObject;
+        javelin = transform.Find("Javelin").gameObject;
     }
     // Update is called once per frame
     void Update()
@@ -96,8 +99,9 @@ public class CharacterControll : MonoBehaviour
             debugSkill.skillID = "debug, selfAttack";
             StartCoroutine(CastRoutine(debugSkill, "Debug"));
         }
-    }
 #endif
+    }
+
 
 
 
@@ -126,4 +130,10 @@ public class CharacterControll : MonoBehaviour
             Debug.Log($"{skillSet.getSkill(skillSlot).skillID} cooldown reduced");
         }
     }
+
+    public void setSkillset(SkillsetBase skillset)
+    {
+        skillSet = skillset;
+    }
+
 }

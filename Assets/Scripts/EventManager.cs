@@ -1,10 +1,10 @@
 using UnityEngine;
 using System;
 
-public class EventManager : MonoBehaviour
+public static class EventManager
 {
     public static Action GameSetup;
-    public static Action PlayerSpawnEvent;
+    public static Action<SkillsetBase> PlayerSpawnEvent;
     public static Action<GameObject> PlayerSpawned;
     public static Action<GameObject, bool> PlayerUIConnection;
     
@@ -13,9 +13,9 @@ public class EventManager : MonoBehaviour
         GameSetup?.Invoke();
     }
 
-    public static void SpawnPlayer()
+    public static void SpawnPlayer(SkillsetBase skillset)
     {
-        PlayerSpawnEvent?.Invoke();
+        PlayerSpawnEvent?.Invoke(skillset);
         
     }
 
