@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,7 +41,29 @@ public class SkillsetBase : ScriptableObject
     [System.NonSerialized]
     public Skill LCtrl;
 
+    private Dictionary<string, Skill> SOSkillDict = new();
     private Dictionary<string, Skill> skillDict = new();
+    private Dictionary<string, Action<int>> setter;
+
+    public void OnEnable()
+    {
+        setter = new   Dictionary<string, Action<int>>()
+        {
+            { "Q", v => QLevel = v},
+            { "E", v => ELevel = v},
+            { "LShift", v => LSLevel = v},
+            { "LCtrl", v => LCtrlLevel = v},
+            { "RClick", v => RCLevel = v},
+            { "Space", v => SLevel = v}
+        };
+        SOSkillDict["LClick"] = LeftClickSO;
+        SOSkillDict["RClick"] = RightClickSO;
+        SOSkillDict["Q"] = QSkillSO;
+        SOSkillDict["E"] = ESkillSO;
+        SOSkillDict["LShift"] = LShiftSO;
+        SOSkillDict["LCtrl"] = LCtrlSO;
+        SOSkillDict["Space"] = SpaceSO;
+    }
 
     public void init()
     {
@@ -133,6 +156,27 @@ public class SkillsetBase : ScriptableObject
             return s;
         Debug.Log("Null Retruned");
         return null;
+    }
+
+    public Skill getSkillSO(string skillSlot)
+    {
+        if (SOSkillDict.TryGetValue(skillSlot, out Skill s))
+            return s;
+        Debug.Log("Null Retruned");
+        return null;
+    }
+
+    public void setSkillLevel(string skillSlot, int level)
+    {
+        if(setter.TryGetValue(skillSlot, out var set))
+        {
+            set(level);
+        }
+        else
+        {
+            Debug.Log("Null Returned");
+            return;
+        }
     }
 
 }
