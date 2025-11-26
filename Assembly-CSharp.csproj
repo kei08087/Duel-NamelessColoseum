@@ -68,11 +68,11 @@
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorShieldUp.cs" />
     <Compile Include="Assets\Scripts\Character\CharacterStatistics.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillInterfaces\Damageable.cs" />
-    <Compile Include="Assets\Scripts\EnteranceUI\StatDistributionSlider.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorBasicAttack.cs" />
     <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceSpeed.cs" />
     <Compile Include="Assets\Scripts\Map\Spawner.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillsetBase.cs" />
+    <Compile Include="Assets\Scripts\Skills\SkillsetBank.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
     <Compile Include="Assets\Scripts\Skills\DamageBlock.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
@@ -98,6 +98,7 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
     <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceDamage.cs" />
+    <Compile Include="Assets\Scripts\EnteranceUI\CharacterSelectionUI.cs" />
     <Compile Include="Assets\Scripts\Map\MapGenerater.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SkillsetBase", menuName = "Scriptable Objects/SkillsetBase")]
 public class SkillsetBase : ScriptableObject
 {
+
+    public CharacterEnum type;
+
     public Skill LeftClickSO;
     public Skill RightClickSO;
     public int RCLevel;

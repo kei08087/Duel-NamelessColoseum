@@ -7,6 +7,8 @@ public class StatDistributionMainUI : MonoBehaviour
 
     [SerializeField]
     private int usableSkillPoint;
+    [SerializeField]
+    private CharacterSelectionUI characterSelectionUI;
 
     public int maxSkillPoint;
 
@@ -31,9 +33,7 @@ public class StatDistributionMainUI : MonoBehaviour
             sld.value = 0;
             string sliderName = sld.name;
             string adjustedName = sliderName.Replace("SkillSlot", "");
-            Debug.Log(adjustedName);
             TextMeshProUGUI textM = sld.GetComponentInChildren<TextMeshProUGUI>();
-            Debug.Log($"[DEBUG] textM is null? {textM == null}");
             textM.text = selectedCharacterSkillset.getSkillSO(adjustedName).skillID;
         }
         display();
@@ -64,6 +64,8 @@ public class StatDistributionMainUI : MonoBehaviour
     {
         string sliderName = signaledFrom.name;
         string adjustedName = sliderName.Replace("SkillSlot", "");
+        Debug.Log(adjustedName);
+        Debug.Log(signaledFrom.value);
         selectedCharacterSkillset.setSkillLevel(adjustedName, (int)signaledFrom.value);
     }
 
@@ -75,5 +77,10 @@ public class StatDistributionMainUI : MonoBehaviour
     public int getSkillPoint()
     {
         return usableSkillPoint;
+    }
+
+    public void recieveSkillset()
+    {
+        selectedCharacterSkillset = characterSelectionUI.getSkillset();
     }
 }
