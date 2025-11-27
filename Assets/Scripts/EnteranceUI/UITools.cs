@@ -21,4 +21,12 @@ public class UITools : MonoBehaviour
         }
     }
 
+    public void exitGame()
+    {
+# if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        Application.Quit();
+    }
+
 }

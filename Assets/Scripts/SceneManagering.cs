@@ -5,6 +5,9 @@ public class SceneManagering : MonoBehaviour
 {
     public static SceneManagering Instance { get; private set; }
     public SkillsetBase playerSkillset;
+    public SkillsetBase enemySkillset;
+
+
 
     void Awake()
     {
@@ -13,11 +16,6 @@ public class SceneManagering : MonoBehaviour
         Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void GameStart()
     {
@@ -28,4 +26,5 @@ public class SceneManagering : MonoBehaviour
     {
         SceneManager.LoadScene("EnteranceScene");
     }
+
 }

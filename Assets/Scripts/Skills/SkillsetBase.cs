@@ -72,6 +72,7 @@ public class SkillsetBase : ScriptableObject
     {
         if (LeftClickSO != null)
         {
+            Debug.Log("LClick Attack Initiated");
             LeftClick = ScriptableObject.Instantiate(LeftClickSO);
         }
         else
@@ -151,6 +152,8 @@ public class SkillsetBase : ScriptableObject
             LCtrl = ScriptableObject.CreateInstance<DummySkill>();
         }
         skillDict["LCtrl"] = LCtrl;
+
+        Debug.Log("Successfully Initialized");
     }
 
     public Skill getSkill(string skillSlot)

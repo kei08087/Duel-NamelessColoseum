@@ -6,6 +6,7 @@ using UnityEngine.Timeline;
 
 public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMoveable
 {
+    public SkillsetBase skillSet;
     public float Mhp = 100;
     public float hp;
     public int basicAttack = 12;
@@ -124,5 +125,10 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
         // 예: Instantiate(deathEffect, transform.position, Quaternion.identity);
 
         Destroy(gameObject, 0.5f); // 약간 딜레이 후 제거
+    }
+
+    public void setSkillset(SkillsetBase skillset)
+    {
+        skillSet = skillset;
     }
 }

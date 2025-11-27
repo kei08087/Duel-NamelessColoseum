@@ -9,7 +9,7 @@ public class CharacterControll : MonoBehaviour
     public CharacterStatistics chstats;
 
     [SerializeField]
-    public SkillsetBase skillSet;
+    private SkillsetBase skillSet;
 
     public bool isDashing = false;
 
@@ -28,6 +28,10 @@ public class CharacterControll : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (skillSet==null)
+        {
+            setSkillset();
+        }
         float hor = Input.GetAxisRaw("Horizontal");
         float ver = Input.GetAxisRaw("Vertical");
 
@@ -114,6 +118,7 @@ public class CharacterControll : MonoBehaviour
 
     IEnumerator CastRoutine(Skill s, string skillSlot)
     {
+        Debug.Log(s);
         Debug.Log("Skill used: "+s.skillID);
         Debug.Log("Skill Level: "+s.skillLevel);
         if(s.basic.delayFront>0f)
@@ -131,9 +136,9 @@ public class CharacterControll : MonoBehaviour
         }
     }
 
-    public void setSkillset(SkillsetBase skillset)
+    void setSkillset()
     {
-        skillSet = skillset;
+        skillSet = chstats.skillSet;
     }
 
 }

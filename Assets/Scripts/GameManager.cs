@@ -6,9 +6,10 @@ public class GameManager : MonoBehaviour
     public GameObject player;
     public GameObject enemy;
 
+    [SerializeField]
     private SkillsetBase playerSkillset;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Awake()
+    private void Start()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;

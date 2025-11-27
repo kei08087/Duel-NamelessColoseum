@@ -18,7 +18,7 @@ public class StatDistributionMainUI : MonoBehaviour
 
     public TextMeshProUGUI currentSkillpointDisplay;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+    public void OnEnable()
     {
         resetSkillPoint();
     }
@@ -31,6 +31,7 @@ public class StatDistributionMainUI : MonoBehaviour
         foreach (Slider sld in sliders)
         {
             sld.value = 0;
+            applySkillPoint(sld);
             string sliderName = sld.name;
             string adjustedName = sliderName.Replace("SkillSlot", "");
             TextMeshProUGUI textM = sld.GetComponentInChildren<TextMeshProUGUI>();
@@ -82,5 +83,10 @@ public class StatDistributionMainUI : MonoBehaviour
     public void recieveSkillset()
     {
         selectedCharacterSkillset = characterSelectionUI.getSkillset();
+    }
+
+    public void returnSkillset(SceneManagering sceneManager)
+    {
+        sceneManager.playerSkillset =  selectedCharacterSkillset;
     }
 }

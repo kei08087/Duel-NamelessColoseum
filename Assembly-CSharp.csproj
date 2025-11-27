@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Map\Spawner.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillsetBase.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillsetBank.cs" />
+    <Compile Include="Assets\Scripts\EnteranceUI\UITools.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorJavelin.cs" />
     <Compile Include="Assets\Scripts\Skills\DamageBlock.cs" />
     <Compile Include="Assets\Scripts\Skills\Skill.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Assets\Scripts\Skills\SkillStructures.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\Javelin.cs" />
     <Compile Include="Assets\Scripts\SceneManagering.cs" />
-    <Compile Include="Assets\Scripts\EnteranceUI\UIManager.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\InGameUI\SkillUI.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorSmite.cs" />

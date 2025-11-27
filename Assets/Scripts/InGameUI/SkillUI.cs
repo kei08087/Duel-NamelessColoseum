@@ -43,7 +43,8 @@ public class SkillUI : MonoBehaviour
         if (isPlayer)
         {
             chCtrl = obj.GetComponent<CharacterControll>();
-            skill = chCtrl.skillSet.getSkill(slotName);
+            CharacterStatistics chstats = obj.GetComponent<CharacterStatistics>();
+            skill = chstats.skillSet.getSkill(slotName);
         }
     }
 }

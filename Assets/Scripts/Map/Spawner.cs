@@ -25,8 +25,10 @@ public class Spawner : MonoBehaviour
         else
             GameManager.Instance.RegisterEnemy(player);
         player.transform.SetParent(wrap.transform, true);
-        SkillsetBase runtimeSkillset = Instantiate(skillset);
-        player.GetComponent<CharacterControll>().setSkillset(runtimeSkillset);
+
+        if(skillset != null&&isPlayer)
+            skillset.init();
+        player.GetComponent<CharacterStatistics>().setSkillset(skillset);
         EventManager.PlayerUIConnection(player, isPlayer);
     }
 
