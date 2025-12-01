@@ -11,6 +11,8 @@ public class CharacterControll : MonoBehaviour
     [SerializeField]
     private SkillsetBase skillSet;
 
+    public LayerMask ground;
+
     public bool isDashing = false;
 
     private GameObject javelin;
@@ -34,6 +36,17 @@ public class CharacterControll : MonoBehaviour
         }
         float hor = Input.GetAxisRaw("Horizontal");
         float ver = Input.GetAxisRaw("Vertical");
+
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if(Physics.Raycast(ray, out RaycastHit hit, 100f, ground))
+        {
+            Vector3 target = hit.point;
+            target.y = transform.position.y;
+
+            transform.LookAt(target);
+        }
+
 
         Vector3 move = new Vector3(hor, 0, ver).normalized;
         if(!isDashing)
