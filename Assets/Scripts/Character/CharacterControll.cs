@@ -46,9 +46,11 @@ public class CharacterControll : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift)&&isReady(skillSet.LShift,"LShift"))
         {
-            
-            javelin.transform.localPosition = new Vector3(0.6f, 0.5f, 0);
-            javelin.transform.localEulerAngles = new Vector3(90, 90, 90);
+            if (skillSet.LShift.skillID != "Dummy Skill")
+            {
+                javelin.transform.localPosition = new Vector3(0.6f, 0.5f, 0);
+                javelin.transform.localEulerAngles = new Vector3(90, 90, 90);
+            }
             StartCoroutine(CastRoutine(skillSet.LShift,"LShift"));
 
         }

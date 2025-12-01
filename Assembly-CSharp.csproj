@@ -96,9 +96,11 @@
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRushSlash.cs" />
     <Compile Include="Assets\Scripts\Skills\Warrior\WarriorRecoverHealth.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\InGameUI\TimeLeftUI.cs" />
     <Compile Include="Assets\Scripts\Skills\SkillExecutor.cs" />
     <Compile Include="Assets\Scripts\Skills\EffectModifier\ReduceDamage.cs" />
     <Compile Include="Assets\Scripts\EnteranceUI\CharacterSelectionUI.cs" />
+    <Compile Include="Assets\Scripts\InGameUI\DDOLInstanceGrabButton.cs" />
     <Compile Include="Assets\Scripts\Map\MapGenerater.cs" />
   </ItemGroup>
   <ItemGroup>

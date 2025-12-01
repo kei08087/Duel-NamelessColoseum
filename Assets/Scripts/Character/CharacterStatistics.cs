@@ -106,14 +106,8 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
 
     public void Move(Vector3 dir)
     {
-        //instanceSpeed = moveSpeed;
-        //foreach(var  m in _moveModifiers)
-        //{
-        //    m.preprocess( ref instanceSpeed, this);
-        //}
-        //if(instanceSpeed<=0)
-        //    instanceSpeed = 0;
-
+        if (GameManager.Instance.gameEnd)
+            return;
         transform.position += dir*instanceSpeed*Time.deltaTime;
     }
 
@@ -125,6 +119,8 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
         // 예: Instantiate(deathEffect, transform.position, Quaternion.identity);
 
         Destroy(gameObject, 0.5f); // 약간 딜레이 후 제거
+
+        EventManager.EndTheGame();
     }
 
     public void setSkillset(SkillsetBase skillset)

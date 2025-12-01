@@ -7,6 +7,7 @@ public static class EventManager
     public static Action<SkillsetBase> PlayerSpawnEvent;
     public static Action<GameObject> PlayerSpawned;
     public static Action<GameObject, bool> PlayerUIConnection;
+    public static Action GameEnd;
     
     public static void GameSet()
     {
@@ -27,5 +28,10 @@ public static class EventManager
     public static void ConnectUI(GameObject character, bool isPlayer)
     {
         PlayerUIConnection?.Invoke(character, isPlayer);
+    }
+
+    public static void EndTheGame()
+    {
+        GameEnd?.Invoke();
     }
 }
