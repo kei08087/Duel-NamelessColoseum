@@ -20,9 +20,12 @@ public class WarriorRushSlash : Skill
 
     SkillStructure currentStat;
 
+    private float TempoScale;
+
     public override void init()
     {
         currentStat = skillStructures[skillLevel];
+        TempoScale = GameManager.Instance.TempoScale;
     }
     public override void execute(Transform caster, SkillExecutor exc)
     {
@@ -36,10 +39,10 @@ public class WarriorRushSlash : Skill
     {
         Vector3 startPos = caster.transform.position;
         Vector3 dir = caster.transform.forward.normalized;
-        Vector3 endPos = startPos + dir * sSt.moveMd.distance;
+        Vector3 endPos = startPos + dir * sSt.moveMd.distance*TempoScale;
 
         Debug.Log("Original Endpos: " + endPos);
-        if (Physics.Raycast(startPos, dir, out RaycastHit hit, sSt.moveMd.distance + 0.5f, obstacleMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(startPos, dir, out RaycastHit hit, sSt.moveMd.distance*TempoScale + 0.5f, obstacleMask, QueryTriggerInteraction.Ignore))
         {
             endPos = hit.point - dir * caster.gameObject.GetComponent<CharacterStatistics>().characterSize;
         }

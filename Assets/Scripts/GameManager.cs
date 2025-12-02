@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public bool gameEnd = false;
     public int gameTimeSet;
     public int gameTime;
+    public float TempoScale = 1;
 
     [SerializeField]
     private SkillsetBase playerSkillset;

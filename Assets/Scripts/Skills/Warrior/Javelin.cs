@@ -14,6 +14,16 @@ public class Javelin : MonoBehaviour
     private float returnTime;
 
     public GameObject parent;
+
+    private Vector3 originalScale;
+    private float TempoScale;
+
+    private void Awake()
+    {
+        originalScale = transform.localScale;
+        TempoScale = GameManager.Instance.TempoScale;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -26,9 +36,9 @@ public class Javelin : MonoBehaviour
         if (launch)
         {
             activate = false;
-            transform.localPosition += transform.up * speed * Time.deltaTime;
-            moved += speed*Time.deltaTime;
-            if(moved>=length)
+            transform.localPosition += transform.up * speed * Time.deltaTime*TempoScale;
+            moved += speed*Time.deltaTime*TempoScale;
+            if(moved>=length*TempoScale)
             {
                 fall();
             }
@@ -68,6 +78,7 @@ public class Javelin : MonoBehaviour
         transform.SetParent(parent.transform,false);
         transform.localPosition = new Vector3(0, 0, -0.6f);
         transform.localEulerAngles = new Vector3(0, 0, -30);
+        transform.localScale = originalScale;
     }
 
     private void fall()

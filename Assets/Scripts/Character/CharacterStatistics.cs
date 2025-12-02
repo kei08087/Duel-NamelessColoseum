@@ -108,7 +108,7 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     {
         if (GameManager.Instance.gameEnd)
             return;
-        transform.position += dir*instanceSpeed*Time.deltaTime;
+        transform.position += dir*instanceSpeed*Time.deltaTime*GameManager.Instance.TempoScale;
     }
 
     void Die()
