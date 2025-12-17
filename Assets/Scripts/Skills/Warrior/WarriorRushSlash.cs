@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "WarriorRushSlash", menuName = "Scriptable Objects/WarriorRushSlash")]
 public class WarriorRushSlash : Skill
@@ -15,8 +16,20 @@ public class WarriorRushSlash : Skill
         public animationModule animationMd;
     }
 
+    private List<skillModule> modules = new()
+    {
+        new basicModule(),
+        new damageModule(),
+        new coneArea(),
+        new moveModule(),
+        new animationModule()
+    };
+
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel].basicMd;
+    public override List<skillModule> moduleSet => modules;
+
+
 
     SkillStructure currentStat;
 

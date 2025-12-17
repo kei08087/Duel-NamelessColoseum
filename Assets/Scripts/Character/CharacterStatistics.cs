@@ -118,9 +118,10 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
         // 사망 이펙트 추가 가능
         // 예: Instantiate(deathEffect, transform.position, Quaternion.identity);
 
-        Destroy(gameObject, 0.5f); // 약간 딜레이 후 제거
+        EventManager.EndTheGame(gameObject);
+        gameObject.SetActive(false);
 
-        EventManager.EndTheGame();
+        
     }
 
     public void setSkillset(SkillsetBase skillset)

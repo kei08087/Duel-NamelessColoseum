@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -13,8 +15,16 @@ public class WarriorBasicAttack : Skill
         public coneArea area;
     }
 
+    private List<skillModule> modules = new()
+    {
+        new basicModule(),
+        new damageModule(),
+        new coneArea()
+    };
+
     public SkillStructure[] skillStructures = new SkillStructure[1];
     public override basicModule basic => skillStructures[0].basicMd;
+    public override List<skillModule> moduleSet => modules;
 
     public override void init()
     {

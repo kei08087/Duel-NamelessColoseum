@@ -32,8 +32,7 @@ public class StatDistributionMainUI : MonoBehaviour
         {
             sld.value = 0;
             applySkillPoint(sld);
-            string sliderName = sld.name;
-            string adjustedName = sliderName.Replace("SkillSlot", "");
+            string adjustedName = getSkillSlotName(sld.name);
             TextMeshProUGUI textM = sld.GetComponentInChildren<TextMeshProUGUI>();
             textM.text = selectedCharacterSkillset.getSkillSO(adjustedName).skillID;
         }
@@ -63,10 +62,8 @@ public class StatDistributionMainUI : MonoBehaviour
 
     void applySkillPoint(Slider signaledFrom)
     {
-        string sliderName = signaledFrom.name;
-        string adjustedName = sliderName.Replace("SkillSlot", "");
-        Debug.Log(adjustedName);
-        Debug.Log(signaledFrom.value);
+
+        string adjustedName = getSkillSlotName(signaledFrom.name);
         selectedCharacterSkillset.setSkillLevel(adjustedName, (int)signaledFrom.value);
     }
 
@@ -88,5 +85,16 @@ public class StatDistributionMainUI : MonoBehaviour
     public void returnSkillset(SceneManagering sceneManager)
     {
         sceneManager.playerSkillset =  selectedCharacterSkillset;
+    }
+
+    public Skill getSkill(Slider recievedSlider)
+    {
+        string adjustedName = getSkillSlotName(recievedSlider.name);
+        return selectedCharacterSkillset.getSkillSO(adjustedName);
+    }
+
+    private string getSkillSlotName(string original)
+    {
+        return original.Replace("SkillSlot", "");
     }
 }

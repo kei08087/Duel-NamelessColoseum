@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     private UITools uiTools;
     [SerializeField]
     private GameObject gameOverUI;
+    [SerializeField]
+    private ApplyResultUI applyResult;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -58,10 +60,33 @@ public class GameManager : MonoBehaviour
         this.enemy = enemy;
     }
 
-    public void endGame()
+    public void endGame(GameObject dead)
     {
         gameEnd = true;
+        applyResult.apply(checkWinner(dead));
         uiTools.openGroup(gameOverUI);
+    }
+
+    string checkWinner(GameObject dead)
+    {
+        if (dead == null)
+        {
+            float playerHp = player.GetComponent<CharacterStatistics>().hp;
+            float enemyHp = enemy.GetComponent<CharacterStatistics>().hp;
+            if (playerHp < enemyHp)
+                return "lose";
+            else if (playerHp > enemyHp)
+                return "win";
+        }
+        else if (dead == player)
+        {
+            return "lose";
+        }
+        else if (dead == enemy)
+        {
+            return "win";
+        }
+        return "draw";
     }
 
     public IEnumerator gameTick()
@@ -71,6 +96,10 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1);
             gameTime--;
         }
-        gameEnd = true;
+        if (!gameEnd)
+        {
+            gameEnd = true;
+            EventManager.EndTheGame(null);
+        }
     }
 }

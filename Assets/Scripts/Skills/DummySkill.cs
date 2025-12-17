@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,8 +11,14 @@ public class DummySkill : Skill
         public basicModule basicMd;
     }
 
+    private List<skillModule> modules = new()
+    {
+        new basicModule()
+    };
+
     public SkillStructure[] skillStructures = new SkillStructure[1];
     public override basicModule basic => skillStructures[0].basicMd;
+    public override List<skillModule> moduleSet => modules;
 
     public void OnEnable()
     {

@@ -7,7 +7,7 @@ public static class EventManager
     public static Action<SkillsetBase> PlayerSpawnEvent;
     public static Action<GameObject> PlayerSpawned;
     public static Action<GameObject, bool> PlayerUIConnection;
-    public static Action GameEnd;
+    public static Action<GameObject> GameEnd;
     
     public static void GameSet()
     {
@@ -30,8 +30,8 @@ public static class EventManager
         PlayerUIConnection?.Invoke(character, isPlayer);
     }
 
-    public static void EndTheGame()
+    public static void EndTheGame(GameObject dead)
     {
-        GameEnd?.Invoke();
+        GameEnd?.Invoke(dead);
     }
 }

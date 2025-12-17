@@ -19,17 +19,17 @@ public class Spawner : MonoBehaviour
     void playerSpawn(SkillsetBase skillset)
     {
         GameObject wrap = Instantiate(wrapper);
-        GameObject player = Instantiate(character, transform.position, transform.rotation);
+        GameObject currentCharacter = Instantiate(character, transform.position, transform.rotation);
         if(isPlayer) 
-            GameManager.Instance.RegisterPlayer(player);
+            GameManager.Instance.RegisterPlayer(currentCharacter);
         else
-            GameManager.Instance.RegisterEnemy(player);
-        player.transform.SetParent(wrap.transform, true);
+            GameManager.Instance.RegisterEnemy(currentCharacter);
+        currentCharacter.transform.SetParent(wrap.transform, true);
 
         if(skillset != null&&isPlayer)
             skillset.init();
-        player.GetComponent<CharacterStatistics>().setSkillset(skillset);
-        EventManager.PlayerUIConnection(player, isPlayer);
+        currentCharacter.GetComponent<CharacterStatistics>().setSkillset(skillset);
+        EventManager.PlayerUIConnection(currentCharacter, isPlayer);
     }
 
 

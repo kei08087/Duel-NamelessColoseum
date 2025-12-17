@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WarriorSmite", menuName = "Scriptable Objects/WarriorSmite")]
@@ -14,8 +16,18 @@ public class WarriorSmite : Skill
         public passiveModule passiveMD;
     }
 
+    private List<skillModule> modules = new()
+    {
+        new basicModule(),
+        new damageModule(),
+        new coneArea(),
+        new movementDebuffModule(),
+        new passiveModule()
+    };
+
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel].basicMd;
+    public override List<skillModule> moduleSet => modules;
 
     SkillStructure currentStat;
 

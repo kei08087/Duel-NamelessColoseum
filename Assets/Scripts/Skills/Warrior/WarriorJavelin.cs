@@ -1,4 +1,7 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
+
 
 [CreateAssetMenu(fileName = "WarriorJavelin", menuName = "Scriptable Objects/WarriorJavelin")]
 public class WarriorJavelin : Skill
@@ -11,8 +14,16 @@ public class WarriorJavelin : Skill
         public missleRangeModule missleRange;
     }
 
+    private List<skillModule> modules = new()
+    {
+        new basicModule(),
+        new damageModule(),
+        new missleRangeModule()
+    };
+
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel].basicMd;
+    public override List<skillModule> moduleSet => modules;
 
     SkillStructure currentStat;
 

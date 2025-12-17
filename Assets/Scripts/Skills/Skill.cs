@@ -1,8 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 using static UnityEngine.GraphicsBuffer;
-using System.Collections;
 
 
 
@@ -15,6 +17,7 @@ public abstract class Skill : ScriptableObject
     public int skillLevel;
 
     public abstract basicModule basic {  get; }
+    public abstract List<skillModule> moduleSet {  get; }
 
     public abstract void init();
 
@@ -29,36 +32,10 @@ public abstract class Skill : ScriptableObject
 
     
     public abstract void execute(Transform caster, SkillExecutor exc);
-    /*
-    public IEnumerator remoteMove(Transform caster)
-    {
-        Vector3 startPos = caster.transform.position;
-        Vector3 dir = caster.transform.forward;
-        Vector3 endPos = startPos + dir * distance;
 
-        if (Physics.Raycast(startPos, dir, out RaycastHit hit, distance, obstacleMask, QueryTriggerInteraction.Ignore))
-        {
-            endPos = hit.point - dir * caster.gameObject.GetComponent<CharacterStatistics>().characterSize;
-        }
+    public bool HasModule<T>() where T : skillModule
+    => moduleSet.Exists(m => m is T);
 
-        float t = 0;
-
-        var chctrl = caster.gameObject.GetComponent<CharacterControll>();
-        chctrl.isDashing = true;
-
-        while( t < delayBack)
-        {
-            t += Time.deltaTime;
-            float u = Mathf.Clamp01(t / delayBack);
-            float k = easing.Evaluate(u);                 // ÀÌÂ¡ °î¼±
-            caster.transform.position = Vector3.Lerp(startPos, endPos, k);
-            yield return null;
-        }
-
-        caster.transform.position = endPos;
-        chctrl.isDashing = false;
-
-    }
-    */
-    
+    public T GetModule<T>() where T : skillModule
+        => (T)moduleSet.Find(m => m is T);
 }
