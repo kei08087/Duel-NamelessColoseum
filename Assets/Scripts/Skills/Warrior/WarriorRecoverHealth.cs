@@ -34,6 +34,9 @@ public class WarriorRecoverHealth : Skill
         while (t < pM.duration)
         {
             yield return new WaitForSeconds(1f);
+            if (chstats == null || chstats.hp <= 0f ||
+                (GameManager.Instance != null && GameManager.Instance.gameEnd))
+                yield break;
             chstats.gainHealth(hM.healAmount);
             t += 1;
         }

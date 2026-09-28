@@ -35,6 +35,7 @@ public class WarriorShieldUp : Skill
         template.reducing=ddM.reduceAmount;
         template.skillName = skillID;
         chstats.assignModifier(template);
+        chstats.AddBasicAttackPenalty(1f);
         try
         {
             yield return new WaitForSeconds(pM.duration);
@@ -42,7 +43,10 @@ public class WarriorShieldUp : Skill
         finally
         {
             if (chstats != null)
+            {
                 chstats.unassignModifier(template);
+                chstats.AddBasicAttackPenalty(-1f);
+            }
             Object.Destroy(template);
         }
     }

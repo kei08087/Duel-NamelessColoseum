@@ -60,8 +60,15 @@ public class WarriorRushSlash : Skill
                 caster.position = Vector3.Lerp(start, end, eased);
 
                 if (progress >= stats.moveMd.hitboxOn && progress < stats.moveMd.hitboxOff && hitTarget == null)
+                {
                     hitTarget = executor.DoOverlapCone(caster, caster.position, stats.area.coneRange,
                         stats.area.angle, targetMask, stats.damageMd.damage);
+                    if (hitTarget != null)
+                    {
+                        end = caster.position;
+                        break;
+                    }
+                }
 
                 yield return null;
             }

@@ -12,6 +12,7 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     public float moveSpeed;
     public float instanceSpeed;
     public float Shield { get; private set; }
+    private float basicAttackPenalty;
 
     readonly List<IDamageProcess> _damageModifiers = new();
     readonly List<IMoveProcess> _moveModifiers = new();
@@ -73,6 +74,16 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     public void GrantShield(float amount)
     {
         Shield += Mathf.Max(0f, amount);
+    }
+
+    public float GetBasicAttackDamage(float baseDamage)
+    {
+        return Mathf.Max(0f, baseDamage - basicAttackPenalty);
+    }
+
+    public void AddBasicAttackPenalty(float amount)
+    {
+        basicAttackPenalty = Mathf.Max(0f, basicAttackPenalty + amount);
     }
 
     public void assignModifier(IDamageProcess modifier)

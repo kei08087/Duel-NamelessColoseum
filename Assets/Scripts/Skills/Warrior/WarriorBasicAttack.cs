@@ -25,7 +25,11 @@ public class WarriorBasicAttack : Skill
     {
         Vector3 origin = caster.transform.position;
 
-        GameObject hitten = exc.DoOverlapCone(caster, origin, skillStructures[0].area.coneRange , skillStructures[0].area.angle, targetMask, skillStructures[0].damageMd.damage);
+        CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
+        float damage = stats != null
+            ? stats.GetBasicAttackDamage(skillStructures[0].damageMd.damage)
+            : skillStructures[0].damageMd.damage;
+        GameObject hitten = exc.DoOverlapCone(caster, origin, skillStructures[0].area.coneRange , skillStructures[0].area.angle, targetMask, damage);
         if (hitten)
         {
             var chctrl = caster.gameObject.GetComponent<CharacterControll>();

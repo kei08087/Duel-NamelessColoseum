@@ -14,6 +14,7 @@ public class CastController : MonoBehaviour
     private CharacterStatistics stats;
     private SkillExecutor executor;
     private Coroutine activeCast;
+    private string activeSlot;
     private float stunnedUntil;
 
     public CastPhase Phase { get; private set; } = CastPhase.Ready;
@@ -30,13 +31,25 @@ public class CastController : MonoBehaviour
 
     public bool TryCast(CombatCommand command)
     {
-        if (Phase != CastPhase.Ready || IsStunned || stats == null || stats.hp <= 0f ||
+        if (IsStunned || stats == null || stats.hp <= 0f ||
             stats.skillSet == null || GameManager.Instance == null || GameManager.Instance.gameEnd)
             return false;
 
         Skill skill = stats.skillSet.getSkill(command.Slot);
-        if (skill == null || (coolEnd.TryGetValue(command.Slot, out float end) && Time.time < end))
+        if (skill == null)
             return false;
+        bool cancelBasicRecovery = Phase == CastPhase.Recovery && activeSlot == "LClick" &&
+            skill.CanCancelBasicRecovery;
+        if ((Phase != CastPhase.Ready && !cancelBasicRecovery) ||
+            (coolEnd.TryGetValue(command.Slot, out float end) && Time.time < end))
+            return false;
+
+        if (cancelBasicRecovery)
+        {
+            if (activeCast != null)
+                StopCoroutine(activeCast);
+            activeCast = null;
+        }
 
         Vector3 direction = command.Direction;
         direction.y = 0f;
@@ -44,6 +57,7 @@ public class CastController : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction.normalized);
 
         Phase = CastPhase.Windup;
+        activeSlot = command.Slot;
         activeCast = StartCoroutine(Cast(skill, command.Slot));
         return true;
     }
@@ -57,6 +71,7 @@ public class CastController : MonoBehaviour
         if (activeCast != null)
             StopCoroutine(activeCast);
         activeCast = null;
+        activeSlot = null;
         Phase = CastPhase.Ready;
     }
 
@@ -64,6 +79,11 @@ public class CastController : MonoBehaviour
     {
         if (coolEnd.TryGetValue(slot, out float end))
             coolEnd[slot] = Mathf.Max(Time.time, end - Mathf.Max(0f, amount));
+    }
+
+    public void ResetCooldown(string slot)
+    {
+        coolEnd[slot] = Time.time;
     }
 
     private IEnumerator Cast(Skill skill, string slot)
@@ -92,5 +112,6 @@ public class CastController : MonoBehaviour
     {
         Phase = CastPhase.Ready;
         activeCast = null;
+        activeSlot = null;
     }
 }
