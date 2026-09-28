@@ -35,8 +35,16 @@ public class WarriorShieldUp : Skill
         template.reducing=ddM.reduceAmount;
         template.skillName = skillID;
         chstats.assignModifier(template);
-        yield return new WaitForSeconds(pM.duration);
-        chstats.unassignModifier(template);
+        try
+        {
+            yield return new WaitForSeconds(pM.duration);
+        }
+        finally
+        {
+            if (chstats != null)
+                chstats.unassignModifier(template);
+            Object.Destroy(template);
+        }
     }
 
 

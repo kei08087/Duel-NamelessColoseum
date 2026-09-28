@@ -9,8 +9,7 @@ public class ReduceSpeed : ScriptableObject, IMoveProcess
 
     public void preprocess(ref float speed, CharacterStatistics chstats)
     {
-        Debug.Log($"Effect of {skillName}, {(1f-reducing)*100}% speed was reduced.");
-        speed *= (1f - reducing);
+        speed *= 1f - Mathf.Clamp01(reducing);
     }
 
     public void postprocess(in float speed, CharacterStatistics chstats) { }
