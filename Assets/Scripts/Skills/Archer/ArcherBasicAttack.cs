@@ -8,6 +8,7 @@ public class ArcherBasicAttack : Skill
     public float range = 3f;
     public float speed = 6f;
     public float width = 0.25f;
+    public StraightProjectile projectilePrefab;
 
     public override basicModule basic => timing;
     public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockHighWalls;
@@ -16,7 +17,7 @@ public class ArcherBasicAttack : Skill
     public override void execute(Transform caster, SkillExecutor executor)
     {
         CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
-        StraightProjectile.Launch(caster, caster.forward,
+        StraightProjectile.Launch(projectilePrefab, caster, caster.forward,
             stats != null ? stats.BasicAttackRange(range) : range,
             stats != null ? stats.ProjectileSpeed(speed) : speed,
             width, stats != null ? stats.GetBasicAttackDamage(damage) : damage,

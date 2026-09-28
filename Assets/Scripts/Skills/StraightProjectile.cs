@@ -1,8 +1,12 @@
 using UnityEngine;
 
-// A graphics-free projectile. Its collision is swept so narrow arrows cannot skip targets.
+// A visible arrow prefab with a swept hitbox so narrow shots cannot skip targets.
 public class StraightProjectile : MonoBehaviour
 {
+    // The javelin is documented as 0.5 m wide but uses a 0.2 m sweep in game.
+    // Keep arrows at the same 40% of their documented width.
+    public const float HitWidthScale = 0.4f;
+
     private Vector3 direction;
     private float remaining;
     private float speed;
@@ -12,20 +16,29 @@ public class StraightProjectile : MonoBehaviour
     private LayerMask targets;
     private AttackWallPolicy walls;
 
-    public static void Launch(Transform caster, Vector3 direction, float range, float speed,
+    public static void Launch(StraightProjectile prefab, Transform caster, Vector3 direction, float range, float speed,
         float width, float damage, LayerMask targets, AttackWallPolicy walls, float knockback = 0f)
     {
         direction.y = 0f;
         if (caster == null || direction.sqrMagnitude < 0.0001f)
             return;
+        if (prefab == null)
+        {
+            Debug.LogError("Straight projectile prefab is not assigned.");
+            return;
+        }
 
-        GameObject arrow = new GameObject("Arrow");
-        arrow.transform.position = caster.position;
-        StraightProjectile projectile = arrow.AddComponent<StraightProjectile>();
+        Vector3 travelDirection = direction.normalized;
+        StraightProjectile projectile = Instantiate(prefab, caster.position,
+            Quaternion.FromToRotation(Vector3.up, travelDirection));
+        float liveWidth = Mathf.Max(0.01f, width * HitWidthScale);
+        // The prefab reuses the javelin's narrow mesh. Widen large skill arrows visibly.
+        projectile.transform.localScale = new Vector3(liveWidth,
+            Mathf.Clamp(0.75f * width / 0.25f, 0.5f, 1.2f), liveWidth);
         projectile.direction = direction.normalized;
         projectile.remaining = Mathf.Max(0f, range);
         projectile.speed = Mathf.Max(0f, speed);
-        projectile.radius = Mathf.Max(0.01f, width * 0.5f);
+        projectile.radius = liveWidth * 0.5f;
         projectile.damage = damage;
         projectile.knockback = knockback;
         projectile.targets = targets;

@@ -14,6 +14,7 @@ public class ArcherDivineBow : Skill
     public float range = 30f;
     public float speed = 8f;
     public float width = 0.75f;
+    public StraightProjectile projectilePrefab;
 
     public override basicModule basic => levels[skillLevel - 1].timing;
     public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockHighWalls;
@@ -22,7 +23,7 @@ public class ArcherDivineBow : Skill
     public override void execute(Transform caster, SkillExecutor executor)
     {
         CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
-        StraightProjectile.Launch(caster, caster.forward, range,
+        StraightProjectile.Launch(projectilePrefab, caster, caster.forward, range,
             stats != null ? stats.ProjectileSpeed(speed) : speed, width,
             levels[skillLevel - 1].damage, targetMask, WallPolicy);
     }
