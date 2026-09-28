@@ -16,6 +16,7 @@ public class WarriorSmite : Skill
 
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
+    public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockAllWalls;
 
     SkillStructure currentStat;
 
@@ -26,7 +27,7 @@ public class WarriorSmite : Skill
     public override void execute(Transform caster, SkillExecutor exc)
     {
         Vector3 origin = caster.transform.position;
-        GameObject hitten = exc.DoOverlapCone(caster, origin, currentStat.area.coneRange, currentStat.area.angle, targetMask, currentStat.damageMd.damage);
+        GameObject hitten = exc.DoOverlapCone(caster, origin, currentStat.area.coneRange, currentStat.area.angle, targetMask, currentStat.damageMd.damage, WallPolicy);
         if(hitten)
         {
             exc.executeCoroutine(slowEffect(hitten,currentStat.movementDebuff,currentStat.passiveMD));

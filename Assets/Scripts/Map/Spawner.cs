@@ -18,14 +18,15 @@ public class Spawner : MonoBehaviour
 
     void playerSpawn(SkillsetBase skillset)
     {
-        if (character == null || wrapper == null)
+        GameObject selectedPrefab = isPlayer ? skillset?.characterPrefab : character;
+        if (selectedPrefab == null || wrapper == null)
         {
             Debug.LogError($"Spawner {name} is missing a character or wrapper prefab.");
             return;
         }
 
         GameObject wrap = Instantiate(wrapper);
-        GameObject spawnedCharacter = Instantiate(character, transform.position, transform.rotation);
+        GameObject spawnedCharacter = Instantiate(selectedPrefab, transform.position, transform.rotation);
         spawnedCharacter.transform.SetParent(wrap.transform, true);
 
         CharacterStatistics stats = spawnedCharacter.GetComponent<CharacterStatistics>();

@@ -44,6 +44,7 @@ public class passiveModule
 public class moveModule
 {
     public float distance;
+    public float duration;
     public float hitboxOn;
     public float hitboxOff;
 }

@@ -7,6 +7,16 @@ public static class MovementCollision
     public static readonly int WallMask = LayerMask.GetMask("LowWall", "HighWall");
     private const float Skin = 0.01f;
 
+    public static int AttackMask(AttackWallPolicy policy)
+    {
+        return policy switch
+        {
+            AttackWallPolicy.BlockHighWalls => HighWallMask,
+            AttackWallPolicy.IgnoreWalls => 0,
+            _ => WallMask
+        };
+    }
+
     public static float LimitDistance(Transform actor, Vector3 direction, float distance)
     {
         if (actor == null || distance <= 0f || direction.sqrMagnitude < 0.0001f)

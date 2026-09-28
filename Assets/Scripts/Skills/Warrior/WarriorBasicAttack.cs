@@ -15,6 +15,7 @@ public class WarriorBasicAttack : Skill
 
     public SkillStructure[] skillStructures = new SkillStructure[1];
     public override basicModule basic => skillStructures[0].basicMd;
+    public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockAllWalls;
 
     public override void init()
     {
@@ -29,7 +30,7 @@ public class WarriorBasicAttack : Skill
         float damage = stats != null
             ? stats.GetBasicAttackDamage(skillStructures[0].damageMd.damage)
             : skillStructures[0].damageMd.damage;
-        GameObject hitten = exc.DoOverlapCone(caster, origin, skillStructures[0].area.coneRange , skillStructures[0].area.angle, targetMask, damage);
+        GameObject hitten = exc.DoOverlapCone(caster, origin, skillStructures[0].area.coneRange , skillStructures[0].area.angle, targetMask, damage, WallPolicy);
         if (hitten)
         {
             var chctrl = caster.gameObject.GetComponent<CharacterControll>();

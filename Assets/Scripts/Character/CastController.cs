@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public enum CastPhase
 {
     Ready,
     Windup,
+    Executing,
     Recovery
 }
 
@@ -58,7 +60,8 @@ public class CastController : MonoBehaviour
 
         Phase = CastPhase.Windup;
         activeSlot = command.Slot;
-        activeCast = StartCoroutine(Cast(skill, command.Slot));
+        Coroutine started = StartCoroutine(Cast(skill, command.Slot));
+        activeCast = Phase == CastPhase.Ready ? null : started;
         return true;
     }
 
@@ -98,10 +101,24 @@ public class CastController : MonoBehaviour
             yield break;
         }
 
-        Phase = CastPhase.Recovery;
-        skill.execute(transform, executor);
-        coolEnd[slot] = Time.time + timing.cooldown;
+        Phase = CastPhase.Executing;
+        float cooldown = slot == "LClick" ? stats.BasicAttackCooldown(timing.cooldown) : timing.cooldown;
+        coolEnd[slot] = Time.time + cooldown;
+        IEnumerator action = skill.ExecuteSequence(transform, executor);
+        if (action != null)
+        {
+            try
+            {
+                while (action.MoveNext())
+                    yield return action.Current;
+            }
+            finally
+            {
+                (action as IDisposable)?.Dispose();
+            }
+        }
 
+        Phase = CastPhase.Recovery;
         if (timing.delayBack > 0f)
             yield return new WaitForSeconds(timing.delayBack);
 

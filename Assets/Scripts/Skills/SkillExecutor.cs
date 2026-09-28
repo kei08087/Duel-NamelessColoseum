@@ -4,18 +4,19 @@ using UnityEngine;
 public class SkillExecutor : MonoBehaviour
 {
     public GameObject DoOverlapCone(Transform caster, Vector3 center, float radius, float angle,
-        LayerMask targetMask, float damage)
+        LayerMask targetMask, float damage, AttackWallPolicy wallPolicy)
     {
         DrawConeGizmo(caster, radius, angle, 0.5f);
         Physics.SyncTransforms();
         Collider[] hits = Physics.OverlapSphere(center, radius, targetMask, QueryTriggerInteraction.Collide);
+        int wallMask = MovementCollision.AttackMask(wallPolicy);
         foreach (Collider hit in hits)
         {
             Vector3 toTarget = hit.bounds.center - caster.position;
             toTarget.y = 0f;
             if (Vector3.Angle(caster.forward, toTarget) > angle * 0.5f)
                 continue;
-            if (Physics.Linecast(center, hit.bounds.center, MovementCollision.HighWallMask,
+            if (wallMask != 0 && Physics.Linecast(center, hit.bounds.center, wallMask,
                 QueryTriggerInteraction.Ignore))
                 continue;
             if (hit.TryGetComponent<IDamageable>(out var target))

@@ -10,16 +10,19 @@ public class Javelin : MonoBehaviour
     public float damage;
     public float speed;
     public LayerMask layer;
+    public AttackWallPolicy wallPolicy;
     public GameObject parent;
 
     private float moved;
     private float returnTime;
     private Vector3 originalScale;
     private float tempoScale;
+    private Collider ownCollider;
 
     private void Awake()
     {
         originalScale = transform.localScale;
+        ownCollider = GetComponent<Collider>();
         tempoScale = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
     }
 
@@ -52,24 +55,9 @@ public class Javelin : MonoBehaviour
         }
 
         Vector3 direction = transform.up.normalized;
-        int collisionMask = layer.value | MovementCollision.HighWallMask;
         Physics.SyncTransforms();
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, 0.1f, direction, step,
-            collisionMask, QueryTriggerInteraction.Collide);
-        RaycastHit nearest = default;
-        bool found = false;
-        foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider == null || hit.collider.gameObject == gameObject)
-                continue;
-            if (!found || hit.distance < nearest.distance)
-            {
-                nearest = hit;
-                found = true;
-            }
-        }
-
-        if (found)
+        if (ProjectileCollision.Sweep(transform.position, direction, 0.1f, step, layer,
+            wallPolicy, ownCollider, out RaycastHit nearest))
         {
             transform.position += direction * Mathf.Max(0f, nearest.distance);
             Hit(nearest.collider);
@@ -84,7 +72,7 @@ public class Javelin : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (launch && ((1 << other.gameObject.layer) & (layer.value | MovementCollision.HighWallMask)) != 0)
+        if (launch && ProjectileCollision.ShouldImpact(other.gameObject.layer, layer, wallPolicy))
             Hit(other);
 
         if (landed && parent != null && other.gameObject == parent)

@@ -16,6 +16,7 @@ public class WarriorRushSlash : Skill
 
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
+    public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockAllWalls;
 
     private SkillStructure currentStat;
     private float tempoScale;
@@ -28,7 +29,12 @@ public class WarriorRushSlash : Skill
 
     public override void execute(Transform caster, SkillExecutor executor)
     {
-        executor.executeCoroutine(MoveAndStrike(caster, executor, currentStat));
+        executor.executeCoroutine(ExecuteSequence(caster, executor));
+    }
+
+    public override IEnumerator ExecuteSequence(Transform caster, SkillExecutor executor)
+    {
+        return MoveAndStrike(caster, executor, currentStat);
     }
 
     private IEnumerator MoveAndStrike(Transform caster, SkillExecutor executor, SkillStructure stats)
@@ -41,7 +47,7 @@ public class WarriorRushSlash : Skill
         float requestedDistance = stats.moveMd.distance * tempoScale;
         float travelDistance = MovementCollision.LimitDistance(caster, direction, requestedDistance);
         Vector3 end = start + direction * travelDistance;
-        float duration = Mathf.Max(0.0001f, stats.basicMd.delayBack);
+        float duration = Mathf.Max(0.0001f, stats.moveMd.duration);
         float elapsed = 0f;
         GameObject hitTarget = null;
         CharacterControll controller = caster.GetComponent<CharacterControll>();
@@ -62,7 +68,7 @@ public class WarriorRushSlash : Skill
                 if (progress >= stats.moveMd.hitboxOn && progress < stats.moveMd.hitboxOff && hitTarget == null)
                 {
                     hitTarget = executor.DoOverlapCone(caster, caster.position, stats.area.coneRange,
-                        stats.area.angle, targetMask, stats.damageMd.damage);
+                        stats.area.angle, targetMask, stats.damageMd.damage, WallPolicy);
                     if (hitTarget != null)
                     {
                         end = caster.position;
@@ -70,6 +76,8 @@ public class WarriorRushSlash : Skill
                     }
                 }
 
+                if (progress >= 1f)
+                    break;
                 yield return null;
             }
 

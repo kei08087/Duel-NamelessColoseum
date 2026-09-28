@@ -13,6 +13,7 @@ public class WarriorJavelin : Skill
 
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
+    public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockHighWalls;
 
     SkillStructure currentStat;
     private Javelin projectile;
@@ -43,6 +44,7 @@ public class WarriorJavelin : Skill
         javelin.transform.SetParent(null,true);
 
         javel.layer = targetMask;
+        javel.wallPolicy = WallPolicy;
         javel.damage = currentStat.damageMd.damage;
         javel.length = currentStat.missleRange.length;
         javel.coolDown = currentStat.basicMd.cooldown;

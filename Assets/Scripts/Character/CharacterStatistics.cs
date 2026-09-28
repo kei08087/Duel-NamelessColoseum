@@ -13,6 +13,10 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     public float instanceSpeed;
     public float Shield { get; private set; }
     private float basicAttackPenalty;
+    private float bonusAttackRate;
+    private float bonusMoveSpeed;
+    private float bonusProjectileSpeed;
+    private float bonusBasicRange;
 
     readonly List<IDamageProcess> _damageModifiers = new();
     readonly List<IMoveProcess> _moveModifiers = new();
@@ -29,7 +33,9 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
 
     private void Update()
     {
-        instanceSpeed = moveSpeed;
+        // Movement uses TempoScale below; bonuses are specified in world metres/second.
+        float tempo = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
+        instanceSpeed = moveSpeed + bonusMoveSpeed / Mathf.Max(0.001f, tempo);
         foreach (var modifier in _moveModifiers)
             modifier.preprocess(ref instanceSpeed, this);
         instanceSpeed = Mathf.Max(0f, instanceSpeed);
@@ -84,6 +90,43 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     public void AddBasicAttackPenalty(float amount)
     {
         basicAttackPenalty = Mathf.Max(0f, basicAttackPenalty + amount);
+    }
+
+    public float BasicAttackCooldown(float baseCooldown)
+    {
+        float baseRate = 1f / Mathf.Max(0.001f, baseCooldown);
+        return 1f / Mathf.Max(0.001f, baseRate + bonusAttackRate);
+    }
+
+    public float ProjectileSpeed(float baseSpeed) => Mathf.Max(0f, baseSpeed + bonusProjectileSpeed);
+    public float BasicAttackRange(float baseRange) => Mathf.Max(0f, baseRange + bonusBasicRange);
+
+    public void AddAgility(float attackRate, float moveSpeedMetresPerSecond)
+    {
+        bonusAttackRate += attackRate;
+        bonusMoveSpeed += moveSpeedMetresPerSecond;
+    }
+
+    public void AddWindBlessing(float projectileSpeed, float basicRange)
+    {
+        bonusProjectileSpeed += projectileSpeed;
+        bonusBasicRange += basicRange;
+    }
+
+    public void ApplyKnockback(Vector3 direction, float distance)
+    {
+        direction.y = 0f;
+        if (direction.sqrMagnitude < 0.0001f || distance <= 0f)
+            return;
+        direction.Normalize();
+        Physics.SyncTransforms();
+        float allowed = MovementCollision.LimitDistance(transform, direction, distance);
+        transform.position += direction * allowed;
+        if (allowed + 0.01f < distance)
+        {
+            TakeDamage(5f);
+            GetComponent<CastController>()?.ApplyStun(0.25f);
+        }
     }
 
     public void assignModifier(IDamageProcess modifier)

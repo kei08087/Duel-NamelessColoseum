@@ -5,6 +5,7 @@ using UnityEngine;
 public class SkillsetBase : ScriptableObject
 {
     public CharacterEnum type;
+    public GameObject characterPrefab;
     public Skill LeftClickSO;
     public Skill RightClickSO;
     public int RCLevel;

@@ -23,7 +23,8 @@ public class CharacterSelectionUI : MonoBehaviour
         var availableCharacters = new List<CharacterEnum>();
         foreach (CharacterEnum character in Enum.GetValues(typeof(CharacterEnum)))
         {
-            if (bank.getSkillset(character) != null)
+            SkillsetBase definition = bank.getSkillset(character);
+            if (definition != null && definition.characterPrefab != null)
                 availableCharacters.Add(character);
         }
         charEnum = availableCharacters.ToArray();
@@ -53,9 +54,14 @@ public class CharacterSelectionUI : MonoBehaviour
 
     private void onDropDownChanged(int index)
     {
-        if (index < 0)
+        if (charEnum == null || index < 0 || index >= charEnum.Length)
             return;
         CharacterEnum selected = charEnum[index];
+        if (selectedSkillSet != null)
+        {
+            selectedSkillSet.ReleaseRuntimeSkills();
+            Destroy(selectedSkillSet);
+        }
         selectedSkillSet = Instantiate(bank.getSkillset(selected));
     }
 
