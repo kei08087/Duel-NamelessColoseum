@@ -25,6 +25,8 @@ public abstract class Skill : ScriptableObject
 
     public abstract void init();
     public abstract void execute(Transform caster, SkillExecutor executor);
+    public virtual void OnWindupStart(Transform caster) { }
+    public virtual void OnWindupEnd(Transform caster) { }
 
     // Return an enumerator when the action itself takes time. Recovery starts
     // only after that enumerator completes; lasting buffs may run separately.

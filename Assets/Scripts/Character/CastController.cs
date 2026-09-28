@@ -17,6 +17,7 @@ public class CastController : MonoBehaviour
     private SkillExecutor executor;
     private Coroutine activeCast;
     private string activeSlot;
+    private Skill windupSkill;
     private float stunnedUntil;
 
     public CastPhase Phase { get; private set; } = CastPhase.Ready;
@@ -29,6 +30,18 @@ public class CastController : MonoBehaviour
     {
         stats = GetComponent<CharacterStatistics>();
         executor = GetComponent<SkillExecutor>();
+    }
+
+    private void Update()
+    {
+        if (Phase == CastPhase.Windup &&
+            (stats == null || stats.hp <= 0f || GameManager.Instance == null || GameManager.Instance.gameEnd))
+            CancelWindup();
+    }
+
+    private void OnDisable()
+    {
+        CancelWindup();
     }
 
     public bool TryCast(CombatCommand command)
@@ -60,6 +73,8 @@ public class CastController : MonoBehaviour
 
         Phase = CastPhase.Windup;
         activeSlot = command.Slot;
+        windupSkill = skill;
+        skill.OnWindupStart(transform);
         Coroutine started = StartCoroutine(Cast(skill, command.Slot));
         activeCast = Phase == CastPhase.Ready ? null : started;
         return true;
@@ -68,14 +83,7 @@ public class CastController : MonoBehaviour
     public void ApplyStun(float duration)
     {
         stunnedUntil = Mathf.Max(stunnedUntil, Time.time + Mathf.Max(0f, duration));
-        if (Phase != CastPhase.Windup)
-            return;
-
-        if (activeCast != null)
-            StopCoroutine(activeCast);
-        activeCast = null;
-        activeSlot = null;
-        Phase = CastPhase.Ready;
+        CancelWindup();
     }
 
     public void ReduceCooldown(string slot, float amount)
@@ -94,6 +102,8 @@ public class CastController : MonoBehaviour
         basicModule timing = skill.basic;
         if (timing.delayFront > 0f)
             yield return new WaitForSeconds(timing.delayFront);
+
+        EndWindup();
 
         if (IsStunned || stats.hp <= 0f || GameManager.Instance == null || GameManager.Instance.gameEnd)
         {
@@ -127,8 +137,28 @@ public class CastController : MonoBehaviour
 
     private void FinishCast()
     {
+        EndWindup();
         Phase = CastPhase.Ready;
         activeCast = null;
         activeSlot = null;
+    }
+
+    private void EndWindup()
+    {
+        if (windupSkill == null)
+            return;
+        Skill skill = windupSkill;
+        windupSkill = null;
+        skill.OnWindupEnd(transform);
+    }
+
+    private void CancelWindup()
+    {
+        if (Phase != CastPhase.Windup)
+            return;
+        EndWindup();
+        if (activeCast != null)
+            StopCoroutine(activeCast);
+        FinishCast();
     }
 }
