@@ -20,7 +20,13 @@ public class CharacterSelectionUI : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        charEnum = (CharacterEnum[])Enum.GetValues(typeof(CharacterEnum));
+        var availableCharacters = new List<CharacterEnum>();
+        foreach (CharacterEnum character in Enum.GetValues(typeof(CharacterEnum)))
+        {
+            if (bank.getSkillset(character) != null)
+                availableCharacters.Add(character);
+        }
+        charEnum = availableCharacters.ToArray();
 
         drop.ClearOptions();
 
@@ -34,8 +40,15 @@ public class CharacterSelectionUI : MonoBehaviour
         
 
         drop.onValueChanged.AddListener(onDropDownChanged);
-        drop.value = -1;
+        if (charEnum.Length == 0)
+        {
+            Debug.LogError("No playable character skillsets are registered.");
+            return;
+        }
+
+        drop.SetValueWithoutNotify(0);
         drop.RefreshShownValue();
+        onDropDownChanged(0);
     }
 
     private void onDropDownChanged(int index)

@@ -17,17 +17,41 @@ public class GameManager : MonoBehaviour
     private UITools uiTools;
     [SerializeField]
     private GameObject gameOverUI;
+    private bool ownsPlayerSkillset;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        playerSkillset = SceneManagering.Instance.playerSkillset;
+        SkillsetBase selectedSkillset = SceneManagering.Instance != null
+            ? SceneManagering.Instance.playerSkillset
+            : null;
+        if (selectedSkillset != null)
+            playerSkillset = selectedSkillset;
+
+        if (playerSkillset == null)
+        {
+            Debug.LogError("Cannot start the match without a player skillset.");
+            return;
+        }
+
+        // Each match owns its runtime skill instances, including when this scene
+        // is started directly in the Editor from its serialized fallback asset.
+        playerSkillset = Instantiate(playerSkillset);
+        ownsPlayerSkillset = true;
         gameTime = gameTimeSet;
         EventManager.GameSet();
         EventManager.SpawnPlayer(playerSkillset);
+        if (player == null || enemy == null)
+        {
+            Debug.LogError("The map must spawn both the player and the test opponent.");
+            return;
+        }
+
         EventManager.SetCamera(player);
+        MobileCombatUI controls = gameObject.AddComponent<MobileCombatUI>();
+        controls.Initialize(player.GetComponent<CombatInputSource>(), playerSkillset);
         StartCoroutine(gameTick());
     }
 
@@ -46,6 +70,11 @@ public class GameManager : MonoBehaviour
     {
         if(Instance==this)
             Instance = null;
+        if (ownsPlayerSkillset && playerSkillset != null)
+        {
+            playerSkillset.ReleaseRuntimeSkills();
+            Destroy(playerSkillset);
+        }
     }
 
 

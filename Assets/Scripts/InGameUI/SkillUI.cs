@@ -3,48 +3,46 @@ using UnityEngine.UI;
 
 public class SkillUI : MonoBehaviour
 {
-    private CharacterControll chCtrl;
-    private Skill skill;      // 예: skillSet.QSkill
-    public string slotName;  // "Q", "LClick" 같은 문자열
-    public Image cdFill;     // 사각형 아이콘 위에 덮을 Image
+    private CharacterControll character;
+    private Skill skill;
+    public string slotName;
+    public Image cdFill;
 
-    public void OnEnable()
+    private void OnEnable()
     {
         EventManager.PlayerUIConnection += Connect;
     }
 
-    public void OnDisable()
+    private void OnDisable()
     {
         EventManager.PlayerUIConnection -= Connect;
     }
 
-    void Update()
+    private void Update()
     {
-        if (chCtrl != null && skill != null && cdFill != null)
+        if (cdFill == null) return;
+        if (skill == null)
         {
-
-            if (!chCtrl.coolEnd.TryGetValue(slotName, out float endTime))
-            {
-                // 아직 한 번도 안 쓴 스킬 → 쿨타임 없음
-                cdFill.fillAmount = 0f;
-                return;
-            }
-
-            float totalCd = skill.basic.cooldown;
-            float remaining = Mathf.Max(0f, endTime - Time.time);
-            float ratio = Mathf.Clamp01(remaining / totalCd);
-
-            cdFill.fillAmount = ratio; // 1 = 꽉찬 쿨, 0 = 사용 가능
+            cdFill.fillAmount = 1f;
+            return;
         }
+
+        if (character == null || !character.coolEnd.TryGetValue(slotName, out float endTime))
+        {
+            cdFill.fillAmount = 0f;
+            return;
+        }
+
+        float cooldown = skill.basic.cooldown;
+        float remaining = Mathf.Max(0f, endTime - Time.time);
+        cdFill.fillAmount = cooldown > 0f ? Mathf.Clamp01(remaining / cooldown) : 0f;
     }
 
-    void Connect(GameObject obj, bool isPlayer)
+    private void Connect(GameObject obj, bool isPlayer)
     {
-        if (isPlayer)
-        {
-            chCtrl = obj.GetComponent<CharacterControll>();
-            CharacterStatistics chstats = obj.GetComponent<CharacterStatistics>();
-            skill = chstats.skillSet.getSkill(slotName);
-        }
+        if (!isPlayer) return;
+        character = obj.GetComponent<CharacterControll>();
+        CharacterStatistics stats = obj.GetComponent<CharacterStatistics>();
+        skill = stats.skillSet.getSkill(slotName);
     }
 }

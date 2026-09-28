@@ -16,7 +16,7 @@ public class WarriorRushSlash : Skill
     }
 
     public SkillStructure[] skillStructures = new SkillStructure[5];
-    public override basicModule basic => skillStructures[skillLevel].basicMd;
+    public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
 
     SkillStructure currentStat;
 
@@ -24,7 +24,7 @@ public class WarriorRushSlash : Skill
 
     public override void init()
     {
-        currentStat = skillStructures[skillLevel];
+        currentStat = skillStructures[skillLevel - 1];
         TempoScale = GameManager.Instance.TempoScale;
     }
     public override void execute(Transform caster, SkillExecutor exc)
