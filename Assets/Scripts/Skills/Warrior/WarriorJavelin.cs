@@ -15,6 +15,7 @@ public class WarriorJavelin : Skill
     public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
 
     SkillStructure currentStat;
+    private Javelin projectile;
 
     public override void init()
     {
@@ -23,9 +24,19 @@ public class WarriorJavelin : Skill
 
     public override void execute(Transform caster, SkillExecutor exc)
     {
-        
-        GameObject javelin = caster.transform.Find("Javelin").gameObject;
-        Javelin javel = javelin.GetComponent<Javelin>();
+        if (projectile == null)
+        {
+            Transform held = caster.Find("Javelin");
+            if (held == null || !held.TryGetComponent(out projectile))
+                return;
+        }
+        if (projectile.landed)
+            projectile.ReturnToOwner();
+        if (projectile.launch)
+            return;
+
+        GameObject javelin = projectile.gameObject;
+        Javelin javel = projectile;
         javelin.transform.localPosition = new Vector3(0.6f, 0.5f, 0f);
         javelin.transform.localEulerAngles = new Vector3(90f, 90f, 90f);
         javel.parent = javelin.transform.parent.gameObject;

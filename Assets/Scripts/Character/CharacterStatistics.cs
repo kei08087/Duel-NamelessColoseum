@@ -110,7 +110,11 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     {
         if (hp <= 0f || GameManager.Instance == null || GameManager.Instance.gameEnd)
             return;
-        transform.position += direction * instanceSpeed * Time.deltaTime * GameManager.Instance.TempoScale;
+        Vector3 displacement = direction * instanceSpeed * Time.deltaTime * GameManager.Instance.TempoScale;
+        displacement.y = 0f;
+        float distance = MovementCollision.LimitDistance(transform, displacement, displacement.magnitude);
+        if (distance > 0f)
+            transform.position += displacement.normalized * distance;
     }
 
     public void setSkillset(SkillsetBase skillset)

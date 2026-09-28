@@ -1,10 +1,9 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "WarriorRushSlash", menuName = "Scriptable Objects/WarriorRushSlash")]
 public class WarriorRushSlash : Skill
 {
-
     [System.Serializable]
     public class SkillStructure
     {
@@ -18,56 +17,62 @@ public class WarriorRushSlash : Skill
     public SkillStructure[] skillStructures = new SkillStructure[5];
     public override basicModule basic => skillStructures[skillLevel - 1].basicMd;
 
-    SkillStructure currentStat;
-
-    private float TempoScale;
+    private SkillStructure currentStat;
+    private float tempoScale;
 
     public override void init()
     {
         currentStat = skillStructures[skillLevel - 1];
-        TempoScale = GameManager.Instance.TempoScale;
-    }
-    public override void execute(Transform caster, SkillExecutor exc)
-    {
-        Vector3 origin = caster.transform.position;
-
-
-        exc.executeCoroutine(remoteMove(caster,exc,currentStat));
+        tempoScale = GameManager.Instance.TempoScale;
     }
 
-    public IEnumerator remoteMove(Transform caster, SkillExecutor exc, SkillStructure sSt)
+    public override void execute(Transform caster, SkillExecutor executor)
     {
-        Vector3 startPos = caster.transform.position;
-        Vector3 dir = caster.transform.forward.normalized;
-        Vector3 endPos = startPos + dir * sSt.moveMd.distance*TempoScale;
+        executor.executeCoroutine(MoveAndStrike(caster, executor, currentStat));
+    }
 
-        Debug.Log("Original Endpos: " + endPos);
-        if (Physics.Raycast(startPos, dir, out RaycastHit hit, sSt.moveMd.distance*TempoScale + 0.5f, obstacleMask, QueryTriggerInteraction.Ignore))
+    private IEnumerator MoveAndStrike(Transform caster, SkillExecutor executor, SkillStructure stats)
+    {
+        Vector3 start = caster.position;
+        Vector3 direction = caster.forward;
+        direction.y = 0f;
+        direction.Normalize();
+
+        float requestedDistance = stats.moveMd.distance * tempoScale;
+        float travelDistance = MovementCollision.LimitDistance(caster, direction, requestedDistance);
+        Vector3 end = start + direction * travelDistance;
+        float duration = Mathf.Max(0.0001f, stats.basicMd.delayBack);
+        float elapsed = 0f;
+        GameObject hitTarget = null;
+        CharacterControll controller = caster.GetComponent<CharacterControll>();
+
+        if (controller != null)
+            controller.isDashing = true;
+
+        try
         {
-            endPos = hit.point - dir * caster.gameObject.GetComponent<CharacterStatistics>().characterSize;
-        }
-        Debug.Log("Endpos: " + endPos);
-        float t = 0;
-
-        var chctrl = caster.gameObject.GetComponent<CharacterControll>();
-        chctrl.isDashing = true;
-        GameObject hitten = null;
-
-        while (t < sSt.basicMd.delayBack)
-        {
-            t += Time.deltaTime;
-            float u = Mathf.Clamp01(t / sSt.basicMd.delayBack);
-            float k = sSt.animationMd.easing.Evaluate(u);                 // ÀÌÂ¡ °î¼±
-            caster.transform.position = Vector3.Lerp(startPos, endPos, k);
-            if (u >= sSt.moveMd.hitboxOn && u < sSt.moveMd.hitboxOff && !hitten)
+            while (caster != null && elapsed < duration &&
+                   (GameManager.Instance == null || !GameManager.Instance.gameEnd))
             {
-                hitten = exc.DoOverlapCone(caster, caster.transform.position, sSt.area.coneRange, sSt.area.angle, targetMask, sSt.damageMd.damage);
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / duration);
+                float eased = Mathf.Clamp01(stats.animationMd.easing.Evaluate(progress));
+                caster.position = Vector3.Lerp(start, end, eased);
+
+                if (progress >= stats.moveMd.hitboxOn && progress < stats.moveMd.hitboxOff && hitTarget == null)
+                    hitTarget = executor.DoOverlapCone(caster, caster.position, stats.area.coneRange,
+                        stats.area.angle, targetMask, stats.damageMd.damage);
+
+                yield return null;
             }
-            yield return null;
+
+            if (caster != null && (GameManager.Instance == null || !GameManager.Instance.gameEnd))
+                caster.position = end;
         }
-
-        caster.transform.position = endPos;
-        chctrl.isDashing = false;
-
+        finally
+        {
+            if (controller != null)
+                controller.isDashing = false;
+        }
     }
 }
