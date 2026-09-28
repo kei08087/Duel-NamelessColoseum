@@ -36,11 +36,10 @@ public class StraightProjectile : MonoBehaviour
         projectile.transform.localScale = new Vector3(liveWidth,
             Mathf.Clamp(0.75f * width / 0.25f, 0.5f, 1.2f), liveWidth);
         projectile.direction = direction.normalized;
-        // WarriorRushSlash applies TempoScale to its documented travel distance.
-        // Archer skill assets also keep the documented distances and use that scale in game.
-        float rangeScale = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
-        projectile.remaining = Mathf.Max(0f, range * rangeScale);
-        projectile.speed = Mathf.Max(0f, speed);
+        // Match the javelin's in-game scaling for both travel distance and speed.
+        float tempoScale = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
+        projectile.remaining = Mathf.Max(0f, range * tempoScale);
+        projectile.speed = Mathf.Max(0f, speed * tempoScale);
         projectile.radius = liveWidth * 0.5f;
         projectile.damage = damage;
         projectile.knockback = knockback;
