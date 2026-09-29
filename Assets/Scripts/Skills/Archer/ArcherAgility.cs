@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ArcherAgility", menuName = "Scriptable Objects/ArcherAgility")]
@@ -19,17 +18,8 @@ public class ArcherAgility : Skill
 
     public override void execute(Transform caster, SkillExecutor executor)
     {
-        executor.executeCoroutine(Buff(caster.GetComponent<CharacterStatistics>(), levels[skillLevel - 1]));
-    }
-
-    private static IEnumerator Buff(CharacterStatistics stats, Level level)
-    {
-        if (stats == null) yield break;
-        stats.AddAgility(level.attackRate, level.moveSpeed);
-        try { yield return new WaitForSeconds(level.duration); }
-        finally
-        {
-            if (stats != null) stats.AddAgility(-level.attackRate, -level.moveSpeed);
-        }
+        CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
+        Level level = levels[skillLevel - 1];
+        stats?.Statuses?.ApplyTimed(new AgilityStatus(level.attackRate, level.moveSpeed), level.duration);
     }
 }

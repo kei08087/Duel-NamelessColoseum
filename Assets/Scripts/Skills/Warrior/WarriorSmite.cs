@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WarriorSmite", menuName = "Scriptable Objects/WarriorSmite")]
@@ -30,26 +29,9 @@ public class WarriorSmite : Skill
         GameObject hitten = exc.DoOverlapCone(caster, origin, currentStat.area.coneRange, currentStat.area.angle, targetMask, currentStat.damageMd.damage, WallPolicy);
         if(hitten)
         {
-            exc.executeCoroutine(slowEffect(hitten,currentStat.movementDebuff,currentStat.passiveMD));
-        }
-    }
-
-    public IEnumerator slowEffect(GameObject hitten, movementDebuffModule rdM, passiveModule pM)
-    {
-        CharacterStatistics chstats = hitten.GetComponent<CharacterStatistics>();
-        var template = rdM.reduceSpeed ? ScriptableObject.Instantiate(rdM.reduceSpeed) : ScriptableObject.CreateInstance<ReduceSpeed>();
-        template.reducing = rdM.reduceAmount;
-        template.skillName = skillID;
-        chstats.assignModifier(template);
-        try
-        {
-            yield return new WaitForSeconds(pM.duration);
-        }
-        finally
-        {
-            if (chstats != null)
-                chstats.unassignModifier(template);
-            Object.Destroy(template);
+            CharacterStatistics target = hitten.GetComponent<CharacterStatistics>();
+            target?.Statuses?.ApplyTimed(new SlowStatus(currentStat.movementDebuff.reduceAmount),
+                currentStat.passiveMD.duration);
         }
     }
 }

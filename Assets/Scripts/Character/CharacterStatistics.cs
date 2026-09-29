@@ -17,6 +17,19 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     private float bonusMoveSpeed;
     private float bonusProjectileSpeed;
     private float bonusBasicRange;
+    private CombatStatusController statuses;
+
+    public CombatStatusController Statuses
+    {
+        get
+        {
+            if (statuses == null)
+                statuses = GetComponent<CombatStatusController>();
+            if (statuses == null && Application.isPlaying)
+                statuses = gameObject.AddComponent<CombatStatusController>();
+            return statuses;
+        }
+    }
 
     readonly List<IDamageProcess> _damageModifiers = new();
     readonly List<IMoveProcess> _moveModifiers = new();

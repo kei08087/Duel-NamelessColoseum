@@ -18,12 +18,11 @@ public class CastController : MonoBehaviour
     private Coroutine activeCast;
     private string activeSlot;
     private Skill windupSkill;
-    private float stunnedUntil;
 
     public CastPhase Phase { get; private set; } = CastPhase.Ready;
     public bool CanMove => Phase != CastPhase.Windup && !IsStunned;
     public bool CanTurn => Phase == CastPhase.Ready && !IsStunned;
-    public bool IsStunned => Time.time < stunnedUntil;
+    public bool IsStunned => stats != null && stats.Statuses != null && stats.Statuses.IsStunned;
     public readonly Dictionary<string, float> coolEnd = new();
 
     private void Awake()
@@ -82,8 +81,10 @@ public class CastController : MonoBehaviour
 
     public void ApplyStun(float duration)
     {
-        stunnedUntil = Mathf.Max(stunnedUntil, Time.time + Mathf.Max(0f, duration));
-        CancelWindup();
+        if (duration <= 0f) return;
+        stats?.Statuses?.ApplyStun(duration);
+        if (Phase == CastPhase.Windup)
+            CancelWindup();
     }
 
     public void ReduceCooldown(string slot, float amount)

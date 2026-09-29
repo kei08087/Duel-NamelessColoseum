@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WarriorShieldUp", menuName = "Scriptable Objects/WarriorShieldUp")]
@@ -23,33 +22,8 @@ public class WarriorShieldUp : Skill
     }
     public override void execute(Transform caster, SkillExecutor exc)
     {
-        exc.executeCoroutine(shieldUp(caster,currentStat.damageDebuff,currentStat.passiveMd));
+        CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
+        stats?.Statuses?.ApplyTimed(new ShieldUpStatus(currentStat.damageDebuff.reduceAmount),
+            currentStat.passiveMd.duration);
     }
-
-    public IEnumerator shieldUp(Transform caster, damageDebuffModule ddM, passiveModule pM)
-    {
-        CharacterStatistics chstats = caster.gameObject.GetComponent<CharacterStatistics>();
-
-        var template = ddM.reduceDamage ? ScriptableObject.Instantiate(ddM.reduceDamage) : ScriptableObject.CreateInstance<ReduceDamage>();
-
-        template.reducing=ddM.reduceAmount;
-        template.skillName = skillID;
-        chstats.assignModifier(template);
-        chstats.AddBasicAttackPenalty(1f);
-        try
-        {
-            yield return new WaitForSeconds(pM.duration);
-        }
-        finally
-        {
-            if (chstats != null)
-            {
-                chstats.unassignModifier(template);
-                chstats.AddBasicAttackPenalty(-1f);
-            }
-            Object.Destroy(template);
-        }
-    }
-
-
 }

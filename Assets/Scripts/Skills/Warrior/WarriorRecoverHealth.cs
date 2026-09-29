@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WarriorRecoverHealth", menuName = "Scriptable Objects/WarriorRecoverHealth")]
@@ -24,21 +23,8 @@ public class WarriorRecoverHealth : Skill
     }
     public override void execute(Transform caster, SkillExecutor exc)
     {
-        exc.executeCoroutine(recover(caster, currentStat.healMd, currentStat.passiveMd));
-    }
-
-    public IEnumerator recover(Transform caster, healModule hM, passiveModule pM)
-    {
-        float t = 0;
-        var chstats = caster.gameObject.GetComponent<CharacterStatistics>();
-        while (t < pM.duration)
-        {
-            yield return new WaitForSeconds(1f);
-            if (chstats == null || chstats.hp <= 0f ||
-                (GameManager.Instance != null && GameManager.Instance.gameEnd))
-                yield break;
-            chstats.gainHealth(hM.healAmount);
-            t += 1;
-        }
+        CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
+        stats?.Statuses?.ApplyTimed(new PeriodicHealStatus(currentStat.healMd.healAmount),
+            currentStat.passiveMd.duration);
     }
 }

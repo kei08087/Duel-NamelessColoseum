@@ -53,4 +53,29 @@ public class LocalDuelTests
         Assert.That(player.hp, Is.LessThan(playerHp));
         Assert.That(enemy.hp, Is.LessThan(enemyHp));
     }
+
+    [UnityTest]
+    public IEnumerator StunCancelsDivineBowWindupAndReusesItsChargeBar()
+    {
+        SceneManager.LoadScene("InGameScene");
+        yield return null;
+        yield return null;
+
+        GameObject archer = GameManager.Instance.enemy;
+        CastController caster = archer.GetComponent<CastController>();
+        Assert.That(caster.TryCast(new CombatCommand("Space", Vector3.zero)), Is.True);
+        Assert.That(caster.Phase, Is.EqualTo(CastPhase.Windup));
+        DivineBowChargeBar bar = archer.GetComponentInChildren<DivineBowChargeBar>(true);
+        Assert.That(bar, Is.Not.Null);
+        Assert.That(bar.gameObject.activeSelf, Is.True);
+
+        caster.ApplyStun(0.25f);
+        Assert.That(caster.Phase, Is.EqualTo(CastPhase.Ready));
+        Assert.That(bar.gameObject.activeSelf, Is.False);
+        Assert.That(caster.coolEnd.ContainsKey("Space"), Is.False);
+
+        yield return new WaitForSeconds(0.3f);
+        Assert.That(caster.TryCast(new CombatCommand("Space", Vector3.zero)), Is.True);
+        Assert.That(archer.GetComponentInChildren<DivineBowChargeBar>(true), Is.SameAs(bar));
+    }
 }

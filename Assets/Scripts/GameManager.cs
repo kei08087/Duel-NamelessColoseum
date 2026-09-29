@@ -1,17 +1,10 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public enum MatchResult { InProgress, PlayerWin, EnemyWin, Draw }
-
-    private struct PendingDamage
-    {
-        public CharacterStatistics target;
-        public DamageBlock damage;
-    }
 
     public static GameManager Instance { get; private set; }
     public GameObject player;
@@ -21,7 +14,8 @@ public class GameManager : MonoBehaviour
     public int gameTime;
     public float TempoScale = 1;
     public MatchResult Result { get; private set; } = MatchResult.InProgress;
-    private readonly List<PendingDamage> pendingDamage = new();
+    private readonly CombatAdjudicator adjudicator = new();
+    public long CombatTick => adjudicator.TickIndex;
     private bool timeoutRequested;
 
     [SerializeField]
@@ -123,47 +117,28 @@ public class GameManager : MonoBehaviour
     public void QueueDamage(CharacterStatistics target, DamageBlock damage)
     {
         if (!gameEnd && target != null)
-            pendingDamage.Add(new PendingDamage { target = target, damage = damage });
+            adjudicator.QueueDamage(target, damage);
     }
 
-    // Resolve every hit gathered before this physics tick, then inspect both HP totals.
-    private void FixedUpdate()
+    public void RequestTimeout() => timeoutRequested = true;
+
+    // FixedUpdate is the single adjudication boundary for queued damage and death.
+    private void FixedUpdate() => AdvanceCombatTick();
+
+    public MatchResult AdvanceCombatTick()
     {
         if (gameEnd || player == null || enemy == null)
-            return;
-
-        int count = pendingDamage.Count;
-        for (int index = 0; index < count; index++)
-        {
-            PendingDamage hit = pendingDamage[index];
-            if (hit.target != null)
-                hit.target.ResolveDamage(hit.damage);
-        }
-        if (count > 0)
-            pendingDamage.RemoveRange(0, count);
+            return Result;
 
         CharacterStatistics playerStats = player.GetComponent<CharacterStatistics>();
         CharacterStatistics enemyStats = enemy.GetComponent<CharacterStatistics>();
         if (playerStats == null || enemyStats == null)
-            return;
+            return Result;
 
-        bool playerDead = playerStats.hp <= 0f;
-        bool enemyDead = enemyStats.hp <= 0f;
-        if (playerDead && enemyDead)
-            Conclude(MatchResult.Draw);
-        else if (playerDead)
-            Conclude(MatchResult.EnemyWin);
-        else if (enemyDead)
-            Conclude(MatchResult.PlayerWin);
-        else if (timeoutRequested)
-        {
-            float playerRatio = playerStats.Mhp > 0f ? playerStats.hp / playerStats.Mhp : 0f;
-            float enemyRatio = enemyStats.Mhp > 0f ? enemyStats.hp / enemyStats.Mhp : 0f;
-            if (Mathf.Abs(playerRatio - enemyRatio) < 0.0001f)
-                Conclude(MatchResult.Draw);
-            else
-                Conclude(playerRatio > enemyRatio ? MatchResult.PlayerWin : MatchResult.EnemyWin);
-        }
+        MatchResult outcome = adjudicator.AdvanceTick(playerStats, enemyStats, timeoutRequested);
+        if (outcome != MatchResult.InProgress)
+            Conclude(outcome);
+        return Result;
     }
 
     private void Conclude(MatchResult result)
@@ -179,6 +154,9 @@ public class GameManager : MonoBehaviour
         if (gameEnd)
             return;
         gameEnd = true;
+        adjudicator.ClearPending();
+        player?.GetComponent<CombatStatusController>()?.Clear();
+        enemy?.GetComponent<CombatStatusController>()?.Clear();
         if (gameOverUI != null)
         {
             TMP_Text resultText = gameOverUI.GetComponentInChildren<TMP_Text>(true);
@@ -204,6 +182,6 @@ public class GameManager : MonoBehaviour
                 gameTime--;
         }
         if (!gameEnd)
-            timeoutRequested = true;
+            RequestTimeout();
     }
 }

@@ -38,6 +38,8 @@ public class Spawner : MonoBehaviour
         }
 
         CombatTargeting.AssignSide(spawnedCharacter, isPlayer);
+        if (spawnedCharacter.GetComponent<CombatStatusController>() == null)
+            spawnedCharacter.AddComponent<CombatStatusController>();
         CombatInputSource input = spawnedCharacter.GetComponent<CombatInputSource>();
         if (input == null)
             input = spawnedCharacter.AddComponent<CombatInputSource>();

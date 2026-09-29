@@ -1,5 +1,4 @@
 #if UNITY_INCLUDE_TESTS
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -10,6 +9,23 @@ public class CombatRegressionTests
         public int priority => 0;
         public void preprocess(ref DamageBlock damage, CharacterStatistics target) => damage.damage -= 3f;
         public void postprocess(in DamageBlock damage, CharacterStatistics target) { }
+    }
+
+    private sealed class FollowUpDamage : IDamageProcess
+    {
+        private readonly GameManager match;
+        private readonly CharacterStatistics other;
+        public int priority => 0;
+
+        public FollowUpDamage(GameManager match, CharacterStatistics other)
+        {
+            this.match = match;
+            this.other = other;
+        }
+
+        public void preprocess(ref DamageBlock damage, CharacterStatistics target) { }
+        public void postprocess(in DamageBlock damage, CharacterStatistics target) =>
+            match.QueueDamage(other, new DamageBlock { damage = 5f });
     }
 
     [Test]
@@ -94,7 +110,7 @@ public class CombatRegressionTests
         {
             match.QueueDamage(player, new DamageBlock { damage = 150f });
             match.QueueDamage(enemy, new DamageBlock { damage = 150f });
-            ResolveTick(match);
+            match.AdvanceCombatTick();
             Assert.That(match.Result, Is.EqualTo(GameManager.MatchResult.Draw));
         });
     }
@@ -105,7 +121,7 @@ public class CombatRegressionTests
         WithMatch((match, player, enemy) =>
         {
             match.QueueDamage(enemy, new DamageBlock { damage = 150f });
-            ResolveTick(match);
+            match.AdvanceCombatTick();
             Assert.That(match.Result, Is.EqualTo(GameManager.MatchResult.PlayerWin));
         });
     }
@@ -119,10 +135,42 @@ public class CombatRegressionTests
             player.hp = 40f;
             enemy.Mhp = 50f;
             enemy.hp = 30f;
-            typeof(GameManager).GetField("timeoutRequested", BindingFlags.Instance | BindingFlags.NonPublic)
-                .SetValue(match, true);
-            ResolveTick(match);
+            match.RequestTimeout();
+            match.AdvanceCombatTick();
             Assert.That(match.Result, Is.EqualTo(GameManager.MatchResult.EnemyWin));
+        });
+    }
+
+    [Test]
+    public void DamageQueuedDuringResolutionWaitsUntilFollowingTick()
+    {
+        WithMatch((match, player, enemy) =>
+        {
+            player.assignModifier(new FollowUpDamage(match, enemy));
+            match.QueueDamage(player, new DamageBlock { damage = 1f });
+            match.AdvanceCombatTick();
+            Assert.That(match.CombatTick, Is.EqualTo(1));
+            Assert.That(enemy.hp, Is.EqualTo(enemy.Mhp));
+
+            match.AdvanceCombatTick();
+            Assert.That(match.CombatTick, Is.EqualTo(2));
+            Assert.That(enemy.hp, Is.EqualTo(enemy.Mhp - 5f));
+        });
+    }
+
+    [Test]
+    public void LethalDamageClearsVictimsStatusesAtTheTickBoundary()
+    {
+        WithMatch((match, player, enemy) =>
+        {
+            CombatStatusController statuses = player.gameObject.AddComponent<CombatStatusController>();
+            statuses.ApplyTimed(new AgilityStatus(1f, 2f), 5f);
+            Assert.That(statuses.ActiveCount, Is.EqualTo(1));
+            match.QueueDamage(player, new DamageBlock { damage = 150f });
+            match.AdvanceCombatTick();
+            Assert.That(match.Result, Is.EqualTo(GameManager.MatchResult.EnemyWin));
+            Assert.That(statuses.ActiveCount, Is.Zero);
+            Assert.That(player.BasicAttackCooldown(1f), Is.EqualTo(1f).Within(0.001f));
         });
     }
 
@@ -140,11 +188,29 @@ public class CombatRegressionTests
             RectTransform fill = (RectTransform)bar.transform.Find("Track/Remaining Charge");
             Assert.That(fill.sizeDelta.x, Is.EqualTo(116f));
 
-            typeof(DivineBowChargeBar).GetField("startedAt", BindingFlags.Instance | BindingFlags.NonPublic)
-                .SetValue(bar, Time.time - 2.5f);
-            typeof(DivineBowChargeBar).GetMethod("LateUpdate", BindingFlags.Instance | BindingFlags.NonPublic)
-                .Invoke(bar, null);
+            Camera view = cameraObject.GetComponent<Camera>();
+            bar.Refresh(view, 2.5f);
             Assert.That(fill.sizeDelta.x, Is.EqualTo(58f).Within(0.5f));
+            Assert.That(bar.RemainingFraction, Is.EqualTo(0.5f));
+
+            Vector3 expected = view.WorldToScreenPoint(actor.transform.position - view.transform.up * 0.85f);
+            RectTransform track = (RectTransform)bar.transform.Find("Track");
+            Assert.That(track.position.x, Is.EqualTo(expected.x).Within(0.1f));
+            Assert.That(track.position.y, Is.EqualTo(expected.y).Within(0.1f));
+
+            view.pixelRect = new Rect(0f, 0f, 1080f, 1920f);
+            bar.Refresh(view, 2.5f);
+            Vector3 portrait = view.WorldToScreenPoint(actor.transform.position - view.transform.up * 0.85f);
+            Assert.That(track.position.x, Is.EqualTo(portrait.x).Within(0.1f));
+            Assert.That(track.position.y, Is.EqualTo(portrait.y).Within(0.1f));
+
+            bar.Refresh(null, 3f);
+            Assert.That(bar.gameObject.activeSelf, Is.True);
+            Assert.That(bar.GetComponent<Canvas>().enabled, Is.False);
+            bar.Refresh(view, 3f);
+            Assert.That(bar.GetComponent<Canvas>().enabled, Is.True);
+            bar.Hide();
+            Assert.That(DivineBowChargeBar.Show(actor.transform, 5f), Is.SameAs(bar));
         }
         finally
         {
@@ -216,6 +282,79 @@ public class CombatRegressionTests
         }
     }
 
+    [Test]
+    public void TimedBuffExpiresOnCombatTickAndCanBeCleared()
+    {
+        GameObject actor = new GameObject("Buff target");
+        try
+        {
+            CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
+            stats.hp = stats.Mhp;
+            CombatStatusController statuses = actor.AddComponent<CombatStatusController>();
+            long duration = CombatStatusController.DurationTicks(1f);
+
+            statuses.ApplyTimed(new AgilityStatus(1f, 2f), 1f);
+            Assert.That(stats.BasicAttackCooldown(1f), Is.EqualTo(0.5f).Within(0.001f));
+            statuses.AdvanceTick(duration - 1);
+            Assert.That(statuses.ActiveCount, Is.EqualTo(1));
+            statuses.AdvanceTick(duration);
+            Assert.That(statuses.ActiveCount, Is.EqualTo(0));
+            Assert.That(stats.BasicAttackCooldown(1f), Is.EqualTo(1f).Within(0.001f));
+
+            statuses.ApplyTimed(new WindBlessingStatus(2f, 3f), 5f);
+            Assert.That(stats.ProjectileSpeed(6f), Is.EqualTo(8f));
+            statuses.Clear();
+            Assert.That(stats.ProjectileSpeed(6f), Is.EqualTo(6f));
+            Assert.That(stats.BasicAttackRange(4f), Is.EqualTo(4f));
+        }
+        finally { Object.DestroyImmediate(actor); }
+    }
+
+    [Test]
+    public void ShieldUpReductionExpiresBeforeFollowingDamage()
+    {
+        GameObject actor = new GameObject("Defending target");
+        try
+        {
+            CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
+            stats.hp = stats.Mhp;
+            CombatStatusController statuses = actor.AddComponent<CombatStatusController>();
+            stats.GrantShield(4f);
+            statuses.ApplyTimed(new ShieldUpStatus(5f), 1f);
+            stats.ResolveDamage(new DamageBlock { damage = 10f });
+            Assert.That(stats.Shield, Is.EqualTo(0f));
+            Assert.That(stats.hp, Is.EqualTo(99f));
+            statuses.AdvanceTick(CombatStatusController.DurationTicks(1f));
+            stats.ResolveDamage(new DamageBlock { damage = 10f });
+            Assert.That(stats.hp, Is.EqualTo(89f));
+        }
+        finally { Object.DestroyImmediate(actor); }
+    }
+
+    [Test]
+    public void HealingPulsesOncePerSecondAndStopsAtExpiration()
+    {
+        GameObject actor = new GameObject("Healing target");
+        try
+        {
+            CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
+            stats.hp = 50f;
+            CombatStatusController statuses = actor.AddComponent<CombatStatusController>();
+            long second = CombatStatusController.DurationTicks(1f);
+            statuses.ApplyTimed(new PeriodicHealStatus(3f), 2f);
+            statuses.AdvanceTick(second - 1);
+            Assert.That(stats.hp, Is.EqualTo(50f));
+            statuses.AdvanceTick(second);
+            Assert.That(stats.hp, Is.EqualTo(53f));
+            statuses.AdvanceTick(second * 2);
+            Assert.That(stats.hp, Is.EqualTo(56f));
+            Assert.That(statuses.ActiveCount, Is.Zero);
+            statuses.AdvanceTick(second * 3);
+            Assert.That(stats.hp, Is.EqualTo(56f));
+        }
+        finally { Object.DestroyImmediate(actor); }
+    }
+
     private static void WithMatch(System.Action<GameManager, CharacterStatistics, CharacterStatistics> check)
     {
         GameObject managerObject = new GameObject("Match manager");
@@ -240,10 +379,5 @@ public class CombatRegressionTests
         }
     }
 
-    private static void ResolveTick(GameManager match)
-    {
-        typeof(GameManager).GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.NonPublic)
-            .Invoke(match, null);
-    }
 }
 #endif
