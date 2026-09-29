@@ -18,6 +18,7 @@ public class ArcherDivineBow : Skill
     public Material chargeMaterial;
 
     private GameObject chargePlate;
+    private DivineBowChargeBar chargeBar;
 
     public override basicModule basic => levels[skillLevel - 1].timing;
     public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockHighWalls;
@@ -44,10 +45,17 @@ public class ArcherDivineBow : Skill
         plateRenderer.receiveShadows = false;
         if (chargeMaterial != null)
             plateRenderer.sharedMaterial = chargeMaterial;
+
+        chargeBar = DivineBowChargeBar.Show(caster, basic.delayFront);
     }
 
     public override void OnWindupEnd(Transform caster)
     {
+        if (chargeBar != null)
+        {
+            chargeBar.Hide();
+            chargeBar = null;
+        }
         if (chargePlate == null)
             return;
         chargePlate.SetActive(false);

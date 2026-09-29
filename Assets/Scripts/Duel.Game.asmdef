@@ -1,0 +1,8 @@
+{
+  "name": "Duel.Game",
+  "rootNamespace": "",
+  "references": ["Unity.TextMeshPro", "Unity.RenderPipelines.Universal.Runtime", "Unity.VisualScripting.Core"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "autoReferenced": true
+}
