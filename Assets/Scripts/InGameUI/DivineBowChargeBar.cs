@@ -17,7 +17,8 @@ public class DivineBowChargeBar : MonoBehaviour
         if (caster == null)
             return null;
 
-        DivineBowChargeBar bar = caster.GetComponentInChildren<DivineBowChargeBar>(true);
+        Transform existing = caster.Find("Divine Bow Charge Bar");
+        DivineBowChargeBar bar = existing != null ? existing.GetComponent<DivineBowChargeBar>() : null;
         if (bar == null)
         {
             GameObject root = new GameObject("Divine Bow Charge Bar", typeof(RectTransform), typeof(Canvas),

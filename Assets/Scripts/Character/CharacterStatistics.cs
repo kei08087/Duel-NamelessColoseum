@@ -18,6 +18,7 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     private float bonusProjectileSpeed;
     private float bonusBasicRange;
     private CombatStatusController statuses;
+    private readonly SlowStatus waterSlow = new(0.25f);
 
     public CombatStatusController Statuses
     {
@@ -48,17 +49,17 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
     {
         float tempo = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
         MapLayout layout = MapGenerater.Active != null ? MapGenerater.Active.Layout : null;
-        instanceSpeed = CalculateMoveSpeed(layout != null && layout.IsWaterAt(transform.position), tempo);
+        if (layout != null && layout.IsWaterAt(transform.position))
+            Statuses?.RefreshTimed("terrain.water", waterSlow, 1f);
+        instanceSpeed = CalculateMoveSpeed(tempo);
     }
 
-    public float CalculateMoveSpeed(bool inWater, float tempo)
+    public float CalculateMoveSpeed(float tempo)
     {
         // Movement uses TempoScale below; bonuses are specified in world metres/second.
         float speed = moveSpeed + bonusMoveSpeed / Mathf.Max(0.001f, tempo);
         foreach (var modifier in _moveModifiers)
             modifier.preprocess(ref speed, this);
-        if (inWater)
-            speed *= 0.75f;
         return Mathf.Max(0f, speed);
     }
 

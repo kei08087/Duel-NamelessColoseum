@@ -43,8 +43,6 @@ public class Spawner : MonoBehaviour
         CombatInputSource input = spawnedCharacter.GetComponent<CombatInputSource>();
         if (input == null)
             input = spawnedCharacter.AddComponent<CombatInputSource>();
-        input.readDesktopInput = true;
-        input.desktopProfile = isPlayer ? DesktopCombatProfile.PlayerOne : DesktopCombatProfile.PlayerTwo;
         skillset.init(CombatTargeting.OpponentMask(isPlayer));
         stats.setSkillset(skillset);
         if (isPlayer)

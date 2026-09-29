@@ -13,6 +13,7 @@ public class CombatStatusController : MonoBehaviour
 {
     private struct ActiveStatus
     {
+        public string key;
         public ICombatStatusEffect effect;
         public long expiresAtTick;
     }
@@ -41,6 +42,35 @@ public class CombatStatusController : MonoBehaviour
         effect.Apply(stats, currentTick);
         active.Add(new ActiveStatus
         {
+            effect = effect,
+            expiresAtTick = currentTick + DurationTicks(durationSeconds)
+        });
+    }
+
+    // Terrain and other persistent sources refresh one instance rather than
+    // stacking a new movement modifier every frame.
+    public void RefreshTimed(string key, ICombatStatusEffect effect, float durationSeconds)
+    {
+        if (string.IsNullOrEmpty(key) || effect == null || durationSeconds <= 0f)
+            return;
+        currentTick = GameManager.Instance != null ? GameManager.Instance.CombatTick : currentTick;
+        for (int i = 0; i < active.Count; i++)
+        {
+            if (active[i].key != key)
+                continue;
+            ActiveStatus entry = active[i];
+            entry.expiresAtTick = currentTick + DurationTicks(durationSeconds);
+            active[i] = entry;
+            return;
+        }
+        if (stats == null) stats = GetComponent<CharacterStatistics>();
+        if (stats == null || stats.hp <= 0f ||
+            (GameManager.Instance != null && GameManager.Instance.gameEnd))
+            return;
+        effect.Apply(stats, currentTick);
+        active.Add(new ActiveStatus
+        {
+            key = key,
             effect = effect,
             expiresAtTick = currentTick + DurationTicks(durationSeconds)
         });

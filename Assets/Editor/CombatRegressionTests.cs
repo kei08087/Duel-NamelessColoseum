@@ -5,6 +5,31 @@ using UnityEngine;
 public class CombatRegressionTests
 {
     [Test]
+    public void AssignSideSetsChildColliderLayer()
+    {
+        GameObject fighter = new GameObject("Layered fighter");
+        GameObject hurtbox = new GameObject("Hurtbox");
+        hurtbox.transform.SetParent(fighter.transform);
+        hurtbox.AddComponent<BoxCollider>();
+        try
+        {
+            CombatTargeting.AssignSide(fighter, false);
+            Assert.That(hurtbox.layer, Is.EqualTo(CombatTargeting.SideLayer(false)));
+        }
+        finally { Object.DestroyImmediate(fighter); }
+    }
+
+    [Test]
+    public void DesktopPhysicalBindingsKeepLogicalSkillSlots()
+    {
+        var bindings = CombatInputSource.BindingsFor(DesktopCombatProfile.PlayerTwo);
+        Assert.That(bindings[0].Key, Is.EqualTo(KeyCode.Alpha1));
+        Assert.That(bindings[0].Slot, Is.EqualTo("LClick"));
+        Assert.That(bindings[5].Key, Is.EqualTo(KeyCode.Alpha6));
+        Assert.That(bindings[5].Slot, Is.EqualTo("Space"));
+    }
+
+    [Test]
     public void MapLayoutsPreserveTestArenaAndProvideWaterTrial()
     {
         MapLayout test = Resources.Load<MapLayout>("MapLayouts/TestArena17");
@@ -29,15 +54,36 @@ public class CombatRegressionTests
         {
             CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
             stats.moveSpeed = 4f;
+            stats.hp = stats.Mhp;
             stats.AddAgility(0f, 2f);
-            Assert.That(stats.CalculateMoveSpeed(false, 2f), Is.EqualTo(5f));
-            Assert.That(stats.CalculateMoveSpeed(true, 2f), Is.EqualTo(3.75f));
+            CombatStatusController statuses = actor.AddComponent<CombatStatusController>();
+            Assert.That(stats.CalculateMoveSpeed(2f), Is.EqualTo(5f));
+            SlowStatus water = new SlowStatus(0.25f);
+            statuses.RefreshTimed("terrain.water", water, 1f);
+            statuses.RefreshTimed("terrain.water", water, 1f);
+            Assert.That(statuses.ActiveCount, Is.EqualTo(1));
+            Assert.That(stats.CalculateMoveSpeed(2f), Is.EqualTo(3.75f));
+            long second = CombatStatusController.DurationTicks(1f);
+            statuses.AdvanceTick(second - 1);
+            statuses.RefreshTimed("terrain.water", water, 1f);
+            statuses.AdvanceTick(second);
+            Assert.That(stats.CalculateMoveSpeed(2f), Is.EqualTo(3.75f));
+            statuses.AdvanceTick(second * 2 - 1);
+            Assert.That(stats.CalculateMoveSpeed(2f), Is.EqualTo(5f));
 
             MapLayout trial = Resources.Load<MapLayout>("MapLayouts/DesertRuinsTrial31");
             Assert.That(trial.IsWaterAt(new Vector3(10f, 1.75f, 15f)), Is.True);
             Assert.That(trial.IsWaterAt(new Vector3(15f, 1.75f, 15f)), Is.False);
         }
         finally { Object.DestroyImmediate(actor); }
+    }
+
+    [Test]
+    public void DivineBowEarlyReleaseDamageScalesFromHalfAtOneSecond()
+    {
+        Assert.That(ArcherDivineBow.ChargeDamageMultiplier(1f, 5f), Is.EqualTo(0.5f));
+        Assert.That(ArcherDivineBow.ChargeDamageMultiplier(3f, 5f), Is.EqualTo(0.75f));
+        Assert.That(ArcherDivineBow.ChargeDamageMultiplier(5f, 5f), Is.EqualTo(1f));
     }
 
     private sealed class FlatReduction : IDamageProcess
@@ -342,6 +388,27 @@ public class CombatRegressionTests
             statuses.Clear();
             Assert.That(stats.ProjectileSpeed(6f), Is.EqualTo(6f));
             Assert.That(stats.BasicAttackRange(4f), Is.EqualTo(4f));
+        }
+        finally { Object.DestroyImmediate(actor); }
+    }
+
+    [Test]
+    public void SequentialStatusCleanupRemovesModifierOnce()
+    {
+        GameObject actor = new GameObject("Cleanup target");
+        try
+        {
+            CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
+            stats.moveSpeed = 4f;
+            stats.hp = stats.Mhp;
+            CombatStatusController statuses = actor.AddComponent<CombatStatusController>();
+            statuses.ApplyTimed(new SlowStatus(0.25f), 5f);
+            Assert.That(stats.CalculateMoveSpeed(1f), Is.EqualTo(3f));
+            statuses.Clear();
+            actor.SetActive(false);
+            statuses.Clear();
+            Assert.That(statuses.ActiveCount, Is.Zero);
+            Assert.That(stats.CalculateMoveSpeed(1f), Is.EqualTo(4f));
         }
         finally { Object.DestroyImmediate(actor); }
     }

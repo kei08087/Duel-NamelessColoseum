@@ -71,6 +71,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        ConfigureLocalInput(player, DesktopCombatProfile.PlayerOne);
+        ConfigureLocalInput(enemy, DesktopCombatProfile.PlayerTwo);
+
         EventManager.SetCamera(player);
         MobileCombatUI controls = gameObject.AddComponent<MobileCombatUI>();
         controls.Initialize(player.GetComponent<CombatInputSource>(), playerSkillset);
@@ -102,6 +105,15 @@ public class GameManager : MonoBehaviour
             enemySkillset.ReleaseRuntimeSkills();
             Destroy(enemySkillset);
         }
+    }
+
+    private static void ConfigureLocalInput(GameObject fighter, DesktopCombatProfile profile)
+    {
+        CombatInputSource input = fighter.GetComponent<CombatInputSource>();
+        if (input == null)
+            return;
+        input.readDesktopInput = true;
+        input.desktopProfile = profile;
     }
 
 

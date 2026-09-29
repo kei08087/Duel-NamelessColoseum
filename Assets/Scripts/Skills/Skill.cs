@@ -17,6 +17,8 @@ public abstract class Skill : ScriptableObject
 
     public abstract basicModule basic { get; }
     public virtual bool CanCancelBasicRecovery => false;
+    public virtual bool CanAimDuringWindup => false;
+    public virtual float EarlyReleaseAfterSeconds => float.PositiveInfinity;
     public virtual AttackWallPolicy WallPolicy => AttackWallPolicy.BlockAllWalls;
 
     [Header("Layer Settings")]

@@ -19,14 +19,20 @@ public class ArcherDivineBow : Skill
 
     private GameObject chargePlate;
     private DivineBowChargeBar chargeBar;
+    private float chargeStartedAt;
+    private float damageMultiplier = 1f;
 
     public override basicModule basic => levels[skillLevel - 1].timing;
     public override AttackWallPolicy WallPolicy => AttackWallPolicy.BlockHighWalls;
+    public override bool CanAimDuringWindup => true;
+    public override float EarlyReleaseAfterSeconds => 1f;
     public override void init() { }
 
     public override void OnWindupStart(Transform caster)
     {
         OnWindupEnd(caster);
+        chargeStartedAt = Time.time;
+        damageMultiplier = 1f;
         chargePlate = GameObject.CreatePrimitive(PrimitiveType.Cube);
         chargePlate.name = "Divine Bow Charge";
         chargePlate.layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -52,6 +58,8 @@ public class ArcherDivineBow : Skill
     public override void OnWindupEnd(Transform caster)
     {
         if (chargeBar != null)
+            damageMultiplier = ChargeDamageMultiplier(Time.time - chargeStartedAt, basic.delayFront);
+        if (chargeBar != null)
         {
             chargeBar.Hide();
             chargeBar = null;
@@ -73,6 +81,10 @@ public class ArcherDivineBow : Skill
         CharacterStatistics stats = caster.GetComponent<CharacterStatistics>();
         StraightProjectile.Launch(projectilePrefab, caster, caster.forward, range,
             stats != null ? stats.ProjectileSpeed(speed) : speed, width,
-            levels[skillLevel - 1].damage, targetMask, WallPolicy);
+            levels[skillLevel - 1].damage * damageMultiplier, targetMask, WallPolicy);
     }
+
+    public static float ChargeDamageMultiplier(float elapsed, float fullChargeSeconds) =>
+        Mathf.Lerp(0.5f, 1f, Mathf.Clamp01((elapsed - 1f) /
+            Mathf.Max(0.001f, fullChargeSeconds - 1f)));
 }

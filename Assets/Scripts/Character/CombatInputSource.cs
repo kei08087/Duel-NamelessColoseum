@@ -20,8 +20,36 @@ public enum DesktopCombatProfile
     PlayerTwo
 }
 
+public readonly struct DesktopSkillBinding
+{
+    public readonly KeyCode Key;
+    public readonly string Slot;
+
+    public DesktopSkillBinding(KeyCode key, string slot)
+    {
+        Key = key;
+        Slot = slot;
+    }
+}
+
 public class CombatInputSource : MonoBehaviour
 {
+    private static readonly DesktopSkillBinding[] PlayerOneSkills =
+    {
+        new(KeyCode.Q, "Q"), new(KeyCode.E, "E"),
+        new(KeyCode.LeftShift, "LShift"), new(KeyCode.Space, "Space"),
+        new(KeyCode.LeftControl, "LCtrl")
+    };
+    private static readonly DesktopSkillBinding[] PlayerTwoSkills =
+    {
+        new(KeyCode.Alpha1, "LClick"), new(KeyCode.Alpha2, "RClick"),
+        new(KeyCode.Alpha3, "Q"), new(KeyCode.Alpha4, "E"),
+        new(KeyCode.Alpha5, "LShift"), new(KeyCode.Alpha6, "Space"),
+        new(KeyCode.Alpha7, "LCtrl")
+    };
+
+    public static IReadOnlyList<DesktopSkillBinding> BindingsFor(DesktopCombatProfile profile) =>
+        profile == DesktopCombatProfile.PlayerTwo ? PlayerTwoSkills : PlayerOneSkills;
     public bool readDesktopInput = true;
     public DesktopCombatProfile desktopProfile = DesktopCombatProfile.PlayerOne;
     private readonly Queue<CombatCommand> commands = new();
@@ -72,24 +100,16 @@ public class CombatInputSource : MonoBehaviour
         if (!readDesktopInput) return;
         if (desktopProfile == DesktopCombatProfile.PlayerTwo)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) Press("LClick", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) Press("RClick", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha3)) Press("Q", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha4)) Press("E", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha5)) Press("LShift", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha6)) Press("Space", Vector3.zero);
-            if (Input.GetKeyDown(KeyCode.Alpha7)) Press("LCtrl", Vector3.zero);
+            foreach (DesktopSkillBinding binding in PlayerTwoSkills)
+                if (Input.GetKeyDown(binding.Key)) Press(binding.Slot, Vector3.zero);
             return;
         }
         if (Input.GetMouseButtonDown(0) &&
             (EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject()))
             Press("LClick", Vector3.zero);
         if (Input.GetMouseButtonDown(1)) Press("RClick", Vector3.zero);
-        if (Input.GetKeyDown(KeyCode.Q)) Press("Q", Vector3.zero);
-        if (Input.GetKeyDown(KeyCode.E)) Press("E", Vector3.zero);
-        if (Input.GetKeyDown(KeyCode.LeftShift)) Press("LShift", Vector3.zero);
-        if (Input.GetKeyDown(KeyCode.Space)) Press("Space", Vector3.zero);
-        if (Input.GetKeyDown(KeyCode.LeftControl)) Press("LCtrl", Vector3.zero);
+        foreach (DesktopSkillBinding binding in PlayerOneSkills)
+            if (Input.GetKeyDown(binding.Key)) Press(binding.Slot, Vector3.zero);
 #endif
     }
 

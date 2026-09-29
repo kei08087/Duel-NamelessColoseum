@@ -20,5 +20,10 @@ public static class CombatTargeting
             return;
         }
         combatant.layer = layer;
+        // Physics masks inspect the collider GameObject's layer, not its root.
+        // Only existing collider owners are assigned; later skill effects keep
+        // their own projectile and obstruction layers.
+        foreach (Collider collider in combatant.GetComponentsInChildren<Collider>(true))
+            collider.gameObject.layer = layer;
     }
 }

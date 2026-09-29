@@ -18,10 +18,13 @@ public class CastController : MonoBehaviour
     private Coroutine activeCast;
     private string activeSlot;
     private Skill windupSkill;
+    private float windupStartedAt;
+    private bool earlyReleaseRequested;
 
     public CastPhase Phase { get; private set; } = CastPhase.Ready;
     public bool CanMove => Phase != CastPhase.Windup && !IsStunned;
-    public bool CanTurn => Phase == CastPhase.Ready && !IsStunned;
+    public bool CanTurn => (Phase == CastPhase.Ready ||
+        (Phase == CastPhase.Windup && windupSkill != null && windupSkill.CanAimDuringWindup)) && !IsStunned;
     public bool IsStunned => stats != null && stats.Statuses != null && stats.Statuses.IsStunned;
     public readonly Dictionary<string, float> coolEnd = new();
 
@@ -49,6 +52,13 @@ public class CastController : MonoBehaviour
             stats.skillSet == null || GameManager.Instance == null || GameManager.Instance.gameEnd)
             return false;
 
+        if (Phase == CastPhase.Windup && command.Slot == activeSlot &&
+            windupSkill != null && Time.time - windupStartedAt >= windupSkill.EarlyReleaseAfterSeconds)
+        {
+            earlyReleaseRequested = true;
+            return true;
+        }
+
         Skill skill = stats.skillSet.getSkill(command.Slot);
         if (skill == null)
             return false;
@@ -73,6 +83,8 @@ public class CastController : MonoBehaviour
         Phase = CastPhase.Windup;
         activeSlot = command.Slot;
         windupSkill = skill;
+        windupStartedAt = Time.time;
+        earlyReleaseRequested = false;
         skill.OnWindupStart(transform);
         Coroutine started = StartCoroutine(Cast(skill, command.Slot));
         activeCast = Phase == CastPhase.Ready ? null : started;
@@ -101,8 +113,8 @@ public class CastController : MonoBehaviour
     private IEnumerator Cast(Skill skill, string slot)
     {
         basicModule timing = skill.basic;
-        if (timing.delayFront > 0f)
-            yield return new WaitForSeconds(timing.delayFront);
+        while (Time.time - windupStartedAt < timing.delayFront && !earlyReleaseRequested)
+            yield return null;
 
         EndWindup();
 
@@ -142,6 +154,7 @@ public class CastController : MonoBehaviour
         Phase = CastPhase.Ready;
         activeCast = null;
         activeSlot = null;
+        earlyReleaseRequested = false;
     }
 
     private void EndWindup()

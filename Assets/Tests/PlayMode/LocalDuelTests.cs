@@ -25,6 +25,11 @@ public class LocalDuelTests
         fighter.transform.position = new Vector3(10f, 1.75f, 15f);
         yield return null;
         Assert.That(fighter.instanceSpeed, Is.EqualTo(drySpeed * 0.75f).Within(0.001f));
+        fighter.transform.position = new Vector3(15f, 1.75f, 15f);
+        yield return null;
+        Assert.That(fighter.instanceSpeed, Is.EqualTo(drySpeed * 0.75f).Within(0.001f));
+        yield return new WaitForSeconds(1.1f);
+        Assert.That(fighter.instanceSpeed, Is.EqualTo(drySpeed).Within(0.001f));
         Assert.That(generator.transform.childCount, Is.GreaterThan(31 * 31));
     }
 
@@ -71,9 +76,41 @@ public class LocalDuelTests
             new CombatCommand("LClick", Vector3.zero)), Is.True);
         Assert.That(match.enemy.GetComponent<CastController>().TryCast(
             new CombatCommand("LClick", Vector3.zero)), Is.True);
-        yield return new WaitForSeconds(0.25f);
+        float deadline = Time.time + 2f;
+        while ((player.hp >= playerHp || enemy.hp >= enemyHp) && Time.time < deadline)
+            yield return null;
         Assert.That(player.hp, Is.LessThan(playerHp));
         Assert.That(enemy.hp, Is.LessThan(enemyHp));
+    }
+
+    [UnityTest]
+    public IEnumerator DivineBowCanAimWithoutMovingAndReleaseEarly()
+    {
+        SceneManager.LoadScene("InGameScene");
+        yield return null;
+        yield return null;
+
+        GameObject archer = GameManager.Instance.enemy;
+        CombatInputSource input = archer.GetComponent<CombatInputSource>();
+        CastController caster = archer.GetComponent<CastController>();
+        Vector3 startingPosition = archer.transform.position;
+        Assert.That(caster.TryCast(new CombatCommand("Space", Vector3.zero)), Is.True);
+        Assert.That(caster.CanMove, Is.False);
+        Assert.That(caster.CanTurn, Is.True);
+        input.SetJoystick(Vector2.right);
+        yield return null;
+        Assert.That(Vector3.Dot(archer.transform.forward, Vector3.right), Is.GreaterThan(0.99f));
+        Assert.That(archer.transform.position.x, Is.EqualTo(startingPosition.x).Within(0.001f));
+        Assert.That(archer.transform.position.z, Is.EqualTo(startingPosition.z).Within(0.001f));
+        Assert.That(caster.TryCast(new CombatCommand("Space", Vector3.zero)), Is.False);
+
+        yield return new WaitForSeconds(1.05f);
+        Assert.That(caster.TryCast(new CombatCommand("Space", Vector3.zero)), Is.True);
+        float deadline = Time.time + 0.5f;
+        while (!caster.coolEnd.ContainsKey("Space") && Time.time < deadline)
+            yield return null;
+        Assert.That(caster.coolEnd.ContainsKey("Space"), Is.True);
+        input.ReleaseJoystick();
     }
 
     [UnityTest]
