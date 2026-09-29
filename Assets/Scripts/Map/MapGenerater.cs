@@ -1,103 +1,102 @@
 using UnityEngine;
-using System;
 
 public class MapGenerater : MonoBehaviour
 {
-    private int[,,] intMap = new int[17,17,2];
-    private GameObject[,] objectMap = new GameObject[17, 17];
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private MapLayout layout;
+    private Material waterMaterial;
+
+    public MapLayout Layout => layout;
+    public static MapGenerater Active { get; private set; }
+
     private void OnEnable()
     {
+        Active = this;
         EventManager.GameSetup += CreateMap;
     }
 
     private void OnDisable()
     {
         EventManager.GameSetup -= CreateMap;
+        if (Active == this)
+            Active = null;
     }
 
-    void CreateMap()
+    private void OnDestroy()
     {
-        int objectToLoad = 5;
-        GameObject block = ReturnMapPrefab(objectToLoad);
-        for (int i = 0; i < 17; i++)
-        {
-            InstantiateBlock(block, new Vector3(0, 1.5f, i), objectToLoad);
-            InstantiateBlock(block, new Vector3(i, 1.5f, 0), objectToLoad);
-            InstantiateBlock(block, new Vector3(16, 1.5f, i), objectToLoad);
-            InstantiateBlock(block, new Vector3(i, 1.5f, 16), objectToLoad);
-        }
-        objectToLoad = 3;
-        block = ReturnMapPrefab(objectToLoad);
-        for (int i = 0; i < 15; i++)
-        {
-            for (int j = 0; j < 15; j++)
-            {
-                InstantiateBlock(block, new Vector3(i + 1, 0.5f, j + 1), objectToLoad);
-            }
-        }
-
-        objectToLoad = 4;
-        block = ReturnMapPrefab(objectToLoad);
-        for (int i = 0; i < 11; i++)
-        {
-            InstantiateBlock(block, new Vector3(3, 1f, i + 3), objectToLoad);
-            InstantiateBlock(block, new Vector3(i + 3, 1f, 3), objectToLoad);
-            InstantiateBlock(block, new Vector3(13, 1f, i + 3), objectToLoad);
-            InstantiateBlock(block, new Vector3(i + 3, 1f, 13), objectToLoad);
-            if (i == 4)
-                i += 2;
-        }
-
-        objectToLoad = 1;
-        block = ReturnMapPrefab(objectToLoad);
-        InstantiateBlock(block, new Vector3(8.5f, 1.75f, 1.5f), objectToLoad, true);
-        objectToLoad = 2;
-        block = ReturnMapPrefab(objectToLoad);
-        InstantiateBlock(block, new Vector3(8.5f, 1.75f, 14.5f), objectToLoad, true);
+        if (waterMaterial != null)
+            Destroy(waterMaterial);
     }
 
-    GameObject ReturnMapPrefab(int objectToLoad)
-    {
-        string objectName = Enum.GetName(typeof(MapEnum), objectToLoad);
-        if (objectName == null)
-        {
-            Debug.LogWarning($"Enum 값 {objectToLoad}에 해당하는 이름이 없습니다.");
-            return null;
-        }
-        string path = $"Prefabs/MapBlocks/{objectName}";
-        GameObject prefab = Resources.Load<GameObject>(path);
-        return prefab;
-    }
+    private void CreateMap() => Build(layout);
 
-    void InstantiateBlock(GameObject objectToInstantiate, Vector3 location, int objectNum, bool isObject=false)
+    public bool Build(MapLayout selectedLayout)
     {
-        int x = (int)location.x;
-        int z = (int)location.z;
-        if (!isObject)
-        {
-            if (intMap[x, z, 0] == 0)
-            {
-                objectMap[x, z] = Instantiate(objectToInstantiate, location, Quaternion.identity, this.transform);
-                intMap[x, z, 0] = 1;
-                intMap[x, z, 1] = objectNum;
-
-            }
-            else
-            {
-                if (intMap[x, z, 1] == objectNum)
-                {
-                    return;
-                }
-                Destroy(objectMap[x, z]);
-                objectMap[x, z] = Instantiate(objectToInstantiate, location, Quaternion.identity, this.transform);
-                intMap[x, z, 1] = objectNum;
-            }
-        }
+        string error;
+        if (selectedLayout == null)
+            error = "no layout assigned";
+        else if (!selectedLayout.IsValid(out error))
+            error = error ?? "invalid layout";
         else
+            error = null;
+        if (error != null)
         {
-            Instantiate(objectToInstantiate, location, Quaternion.identity,this.transform);
+            Debug.LogError("Cannot build map: " + error, this);
+            return false;
         }
-            return;
+
+        GameObject floor = LoadBlock(MapEnum.Basic_Floor);
+        GameObject lowWall = LoadBlock(MapEnum.Basic_Low_Wall);
+        GameObject highWall = LoadBlock(MapEnum.Basic_High_Wall);
+        GameObject playerSpawn = LoadBlock(MapEnum.SpawnerPlayer);
+        GameObject enemySpawn = LoadBlock(MapEnum.SpawnerEnemy);
+        if (floor == null || lowWall == null || highWall == null || playerSpawn == null || enemySpawn == null)
+        {
+            Debug.LogError("A map block or spawner prefab is missing.", this);
+            return false;
+        }
+
+        for (int i = transform.childCount - 1; i >= 0; i--)
+            Destroy(transform.GetChild(i).gameObject);
+
+        layout = selectedLayout;
+        for (int z = 0; z < layout.Height; z++)
+        {
+            for (int x = 0; x < layout.Width; x++)
+            {
+                char tile = layout.TileAt(x, z);
+                Vector3 position = new Vector3(x, tile == 'F' || tile == 'W' ? 0.5f : tile == 'L' ? 1f : 1.5f, z);
+                GameObject block = tile == 'H' ? highWall : tile == 'L' ? lowWall : floor;
+                Instantiate(block, position, Quaternion.identity, transform);
+                if (tile == 'W')
+                    AddWaterSurface(x, z);
+            }
+        }
+
+        Instantiate(playerSpawn, layout.PlayerSpawn, Quaternion.identity, transform);
+        Instantiate(enemySpawn, layout.EnemySpawn, Quaternion.identity, transform);
+        return true;
+    }
+
+    private static GameObject LoadBlock(MapEnum block) =>
+        Resources.Load<GameObject>("Prefabs/MapBlocks/" + block);
+
+    private void AddWaterSurface(int x, int z)
+    {
+        GameObject surface = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        surface.name = "WaterSurface";
+        surface.layer = LayerMask.NameToLayer("Water");
+        surface.transform.SetParent(transform, false);
+        surface.transform.position = new Vector3(x, 1.01f, z);
+        surface.transform.localScale = new Vector3(1f, 0.02f, 1f);
+        surface.GetComponent<Collider>().enabled = false;
+
+        if (waterMaterial == null)
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (shader == null)
+                shader = Shader.Find("Unlit/Color");
+            waterMaterial = new Material(shader) { color = new Color(0.15f, 0.45f, 0.8f) };
+        }
+        surface.GetComponent<Renderer>().sharedMaterial = waterMaterial;
     }
 }

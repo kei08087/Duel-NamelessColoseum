@@ -46,12 +46,20 @@ public class CharacterStatistics : MonoBehaviour, IDamageable, IHealable, IMovea
 
     private void Update()
     {
-        // Movement uses TempoScale below; bonuses are specified in world metres/second.
         float tempo = GameManager.Instance != null ? GameManager.Instance.TempoScale : 1f;
-        instanceSpeed = moveSpeed + bonusMoveSpeed / Mathf.Max(0.001f, tempo);
+        MapLayout layout = MapGenerater.Active != null ? MapGenerater.Active.Layout : null;
+        instanceSpeed = CalculateMoveSpeed(layout != null && layout.IsWaterAt(transform.position), tempo);
+    }
+
+    public float CalculateMoveSpeed(bool inWater, float tempo)
+    {
+        // Movement uses TempoScale below; bonuses are specified in world metres/second.
+        float speed = moveSpeed + bonusMoveSpeed / Mathf.Max(0.001f, tempo);
         foreach (var modifier in _moveModifiers)
-            modifier.preprocess(ref instanceSpeed, this);
-        instanceSpeed = Mathf.Max(0f, instanceSpeed);
+            modifier.preprocess(ref speed, this);
+        if (inWater)
+            speed *= 0.75f;
+        return Mathf.Max(0f, speed);
     }
 
     public void TakeDamage(float amount)

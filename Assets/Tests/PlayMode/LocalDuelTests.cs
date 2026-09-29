@@ -7,6 +7,28 @@ using UnityEngine.TestTools;
 public class LocalDuelTests
 {
     [UnityTest]
+    public IEnumerator TrialMapBuildsAndWaterSlowsACombatant()
+    {
+        SceneManager.LoadScene("DesertRuinsTrialScene");
+        yield return null;
+        yield return null;
+
+        MapGenerater generator = Object.FindFirstObjectByType<MapGenerater>();
+        MapLayout trial = Resources.Load<MapLayout>("MapLayouts/DesertRuinsTrial31");
+        Assert.That(generator, Is.Not.Null);
+        Assert.That(generator.Layout, Is.SameAs(trial));
+
+        CharacterStatistics fighter = GameManager.Instance.player.GetComponent<CharacterStatistics>();
+        fighter.transform.position = new Vector3(15f, 1.75f, 15f);
+        yield return null;
+        float drySpeed = fighter.instanceSpeed;
+        fighter.transform.position = new Vector3(10f, 1.75f, 15f);
+        yield return null;
+        Assert.That(fighter.instanceSpeed, Is.EqualTo(drySpeed * 0.75f).Within(0.001f));
+        Assert.That(generator.transform.childCount, Is.GreaterThan(31 * 31));
+    }
+
+    [UnityTest]
     public IEnumerator InGameSceneSpawnsTwoPlayableCombatants()
     {
         SceneManager.LoadScene("InGameScene");

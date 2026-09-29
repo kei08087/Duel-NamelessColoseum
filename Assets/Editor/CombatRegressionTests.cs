@@ -4,6 +4,42 @@ using UnityEngine;
 
 public class CombatRegressionTests
 {
+    [Test]
+    public void MapLayoutsPreserveTestArenaAndProvideWaterTrial()
+    {
+        MapLayout test = Resources.Load<MapLayout>("MapLayouts/TestArena17");
+        MapLayout trial = Resources.Load<MapLayout>("MapLayouts/DesertRuinsTrial31");
+        Assert.That(test, Is.Not.Null);
+        Assert.That(trial, Is.Not.Null);
+        Assert.That(test.IsValid(out _), Is.True);
+        Assert.That(trial.IsValid(out _), Is.True);
+        Assert.That((test.Width, test.Height), Is.EqualTo((17, 17)));
+        Assert.That((trial.Width, trial.Height), Is.EqualTo((31, 31)));
+        Assert.That(test.TileAt(3, 3), Is.EqualTo('L'));
+        Assert.That(test.TileAt(8, 3), Is.EqualTo('F'));
+        Assert.That(trial.TileAt(10, 15), Is.EqualTo('W'));
+        Assert.That(trial.TileAt(15, 15), Is.EqualTo('F'));
+    }
+
+    [Test]
+    public void WaterReducesFinalMovementSpeedByOneQuarter()
+    {
+        GameObject actor = new GameObject("Water speed target");
+        try
+        {
+            CharacterStatistics stats = actor.AddComponent<CharacterStatistics>();
+            stats.moveSpeed = 4f;
+            stats.AddAgility(0f, 2f);
+            Assert.That(stats.CalculateMoveSpeed(false, 2f), Is.EqualTo(5f));
+            Assert.That(stats.CalculateMoveSpeed(true, 2f), Is.EqualTo(3.75f));
+
+            MapLayout trial = Resources.Load<MapLayout>("MapLayouts/DesertRuinsTrial31");
+            Assert.That(trial.IsWaterAt(new Vector3(10f, 1.75f, 15f)), Is.True);
+            Assert.That(trial.IsWaterAt(new Vector3(15f, 1.75f, 15f)), Is.False);
+        }
+        finally { Object.DestroyImmediate(actor); }
+    }
+
     private sealed class FlatReduction : IDamageProcess
     {
         public int priority => 0;
