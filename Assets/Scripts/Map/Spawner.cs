@@ -2,31 +2,30 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public GameObject character;
     public GameObject wrapper;
     public bool isPlayer = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void OnEnable()
     {
-        EventManager.PlayerSpawnEvent += playerSpawn;
+        EventManager.CombatantsSpawnEvent += SpawnCombatant;
     }
 
     private void OnDisable()
     {
-        EventManager.PlayerSpawnEvent -= playerSpawn;
+        EventManager.CombatantsSpawnEvent -= SpawnCombatant;
     }
 
-    void playerSpawn(SkillsetBase skillset)
+    private void SpawnCombatant(SkillsetBase playerSkillset, SkillsetBase enemySkillset)
     {
-        GameObject selectedPrefab = isPlayer ? skillset?.characterPrefab : character;
-        if (selectedPrefab == null || wrapper == null)
+        SkillsetBase skillset = isPlayer ? playerSkillset : enemySkillset;
+        if (skillset == null || skillset.characterPrefab == null || wrapper == null)
         {
-            Debug.LogError($"Spawner {name} is missing a character or wrapper prefab.");
+            Debug.LogError($"Spawner {name} is missing a skillset, character, or wrapper prefab.");
             return;
         }
 
         GameObject wrap = Instantiate(wrapper);
-        GameObject spawnedCharacter = Instantiate(selectedPrefab, transform.position, transform.rotation);
+        GameObject spawnedCharacter = Instantiate(skillset.characterPrefab, transform.position, transform.rotation);
         spawnedCharacter.transform.SetParent(wrap.transform, true);
 
         CharacterStatistics stats = spawnedCharacter.GetComponent<CharacterStatistics>();
@@ -38,21 +37,20 @@ public class Spawner : MonoBehaviour
             return;
         }
 
+        CombatTargeting.AssignSide(spawnedCharacter, isPlayer);
+        CombatInputSource input = spawnedCharacter.GetComponent<CombatInputSource>();
+        if (input == null)
+            input = spawnedCharacter.AddComponent<CombatInputSource>();
+        input.readDesktopInput = true;
+        input.desktopProfile = isPlayer ? DesktopCombatProfile.PlayerOne : DesktopCombatProfile.PlayerTwo;
+        skillset.init(CombatTargeting.OpponentMask(isPlayer));
+        stats.setSkillset(skillset);
         if (isPlayer)
-        {
-            if (spawnedCharacter.GetComponent<CombatInputSource>() == null)
-                spawnedCharacter.AddComponent<CombatInputSource>();
-            skillset.init();
-            stats.setSkillset(skillset);
             GameManager.Instance.RegisterPlayer(spawnedCharacter);
-        }
         else
-        {
-            stats.setSkillset(null);
             GameManager.Instance.RegisterEnemy(spawnedCharacter);
-        }
 
-        EventManager.PlayerUIConnection(spawnedCharacter, isPlayer);
+        EventManager.ConnectUI(spawnedCharacter, isPlayer);
     }
 
 

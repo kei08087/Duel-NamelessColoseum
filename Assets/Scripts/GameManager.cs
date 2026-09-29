@@ -27,10 +27,13 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private SkillsetBase playerSkillset;
     [SerializeField]
+    private SkillsetBase enemySkillset;
+    [SerializeField]
     private UITools uiTools;
     [SerializeField]
     private GameObject gameOverUI;
     private bool ownsPlayerSkillset;
+    private bool ownsEnemySkillset;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
@@ -43,22 +46,34 @@ public class GameManager : MonoBehaviour
         if (selectedSkillset != null)
             playerSkillset = selectedSkillset;
 
+        SkillsetBase selectedEnemySkillset = SceneManagering.Instance != null
+            ? SceneManagering.Instance.enemySkillset
+            : null;
+        if (selectedEnemySkillset != null)
+            enemySkillset = selectedEnemySkillset;
+
         if (playerSkillset == null)
         {
             Debug.LogError("Cannot start the match without a player skillset.");
             return;
         }
 
-        // Each match owns its runtime skill instances, including when this scene
-        // is started directly in the Editor from its serialized fallback asset.
+        // A missing opponent selection makes a mirror match; the scene can also
+        // provide a different local test opponent in its serialized field.
+        if (enemySkillset == null)
+            enemySkillset = playerSkillset;
+
+        // Both sides own separate skillset and skill instances, even in a mirror match.
         playerSkillset = Instantiate(playerSkillset);
         ownsPlayerSkillset = true;
+        enemySkillset = Instantiate(enemySkillset);
+        ownsEnemySkillset = true;
         gameTime = gameTimeSet;
         EventManager.GameSet();
-        EventManager.SpawnPlayer(playerSkillset);
+        EventManager.SpawnCombatants(playerSkillset, enemySkillset);
         if (player == null || enemy == null)
         {
-            Debug.LogError("The map must spawn both the player and the test opponent.");
+            Debug.LogError("The map must spawn both combatants.");
             return;
         }
 
@@ -87,6 +102,11 @@ public class GameManager : MonoBehaviour
         {
             playerSkillset.ReleaseRuntimeSkills();
             Destroy(playerSkillset);
+        }
+        if (ownsEnemySkillset && enemySkillset != null)
+        {
+            enemySkillset.ReleaseRuntimeSkills();
+            Destroy(enemySkillset);
         }
     }
 

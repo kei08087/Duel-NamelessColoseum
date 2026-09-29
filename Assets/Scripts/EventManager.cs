@@ -4,7 +4,7 @@ using System;
 public static class EventManager
 {
     public static Action GameSetup;
-    public static Action<SkillsetBase> PlayerSpawnEvent;
+    public static Action<SkillsetBase, SkillsetBase> CombatantsSpawnEvent;
     public static Action<GameObject> PlayerSpawned;
     public static Action<GameObject, bool> PlayerUIConnection;
     public static Action GameEnd;
@@ -14,10 +14,9 @@ public static class EventManager
         GameSetup?.Invoke();
     }
 
-    public static void SpawnPlayer(SkillsetBase skillset)
+    public static void SpawnCombatants(SkillsetBase playerSkillset, SkillsetBase enemySkillset)
     {
-        PlayerSpawnEvent?.Invoke(skillset);
-        
+        CombatantsSpawnEvent?.Invoke(playerSkillset, enemySkillset);
     }
 
     public static void SetCamera(GameObject player)

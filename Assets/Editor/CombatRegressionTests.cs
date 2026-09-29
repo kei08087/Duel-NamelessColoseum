@@ -153,6 +153,69 @@ public class CombatRegressionTests
         }
     }
 
+    [Test]
+    public void TwoCombatantsOwnSeparateSkillInstancesAndOpponentMasks()
+    {
+        DummySkill definition = ScriptableObject.CreateInstance<DummySkill>();
+        SkillsetBase first = ScriptableObject.CreateInstance<SkillsetBase>();
+        SkillsetBase second = ScriptableObject.CreateInstance<SkillsetBase>();
+        try
+        {
+            first.QSkillSO = definition;
+            second.QSkillSO = definition;
+            first.setSkillLevel("Q", 1);
+            second.setSkillLevel("Q", 5);
+            first.init(CombatTargeting.OpponentMask(true));
+            second.init(CombatTargeting.OpponentMask(false));
+
+            Assert.That(first.getSkill("Q"), Is.Not.SameAs(second.getSkill("Q")));
+            Assert.That(first.getSkill("Q").skillLevel, Is.EqualTo(1));
+            Assert.That(second.getSkill("Q").skillLevel, Is.EqualTo(5));
+            Assert.That(first.getSkill("Q").targetMask.value, Is.EqualTo(LayerMask.GetMask("Enemy")));
+            Assert.That(second.getSkill("Q").targetMask.value, Is.EqualTo(LayerMask.GetMask("Player")));
+        }
+        finally
+        {
+            if (first.getSkill("Q") != null) Object.DestroyImmediate(first.getSkill("Q"));
+            if (second.getSkill("Q") != null) Object.DestroyImmediate(second.getSkill("Q"));
+            Object.DestroyImmediate(first);
+            Object.DestroyImmediate(second);
+            Object.DestroyImmediate(definition);
+        }
+    }
+
+    [Test]
+    public void LocalInputSourcesKeepCommandsAndMovementSeparate()
+    {
+        GameObject firstObject = new GameObject("First controller");
+        GameObject secondObject = new GameObject("Second controller");
+        try
+        {
+            CombatInputSource first = firstObject.AddComponent<CombatInputSource>();
+            CombatInputSource second = secondObject.AddComponent<CombatInputSource>();
+            first.desktopProfile = DesktopCombatProfile.PlayerOne;
+            second.desktopProfile = DesktopCombatProfile.PlayerTwo;
+            first.SetJoystick(Vector2.right);
+            second.SetJoystick(Vector2.left);
+            first.Press("Q", Vector3.forward);
+            second.Press("Space", Vector3.back);
+
+            Assert.That(first.MoveDirection, Is.EqualTo(Vector3.right));
+            Assert.That(second.MoveDirection, Is.EqualTo(Vector3.left));
+            Assert.That(first.TryDequeue(out CombatCommand firstCommand), Is.True);
+            Assert.That(second.TryDequeue(out CombatCommand secondCommand), Is.True);
+            Assert.That(firstCommand.Slot, Is.EqualTo("Q"));
+            Assert.That(secondCommand.Slot, Is.EqualTo("Space"));
+            Assert.That(first.TryDequeue(out _), Is.False);
+            Assert.That(second.TryDequeue(out _), Is.False);
+        }
+        finally
+        {
+            Object.DestroyImmediate(firstObject);
+            Object.DestroyImmediate(secondObject);
+        }
+    }
+
     private static void WithMatch(System.Action<GameManager, CharacterStatistics, CharacterStatistics> check)
     {
         GameObject managerObject = new GameObject("Match manager");

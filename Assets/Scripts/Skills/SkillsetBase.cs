@@ -30,16 +30,18 @@ public class SkillsetBase : ScriptableObject
 
     private readonly Dictionary<string, Skill> skillDict = new();
 
-    public void init()
+    public void init() => init(LayerMask.GetMask("Enemy"));
+
+    public void init(LayerMask opponentMask)
     {
         ReleaseRuntimeSkills();
-        LeftClick = CreateRuntimeSkill(LeftClickSO, 1);
-        RightClick = CreateRuntimeSkill(RightClickSO, RCLevel);
-        QSkill = CreateRuntimeSkill(QSkillSO, QLevel);
-        ESkill = CreateRuntimeSkill(ESkillSO, ELevel);
-        LShift = CreateRuntimeSkill(LShiftSO, LSLevel);
-        Space = CreateRuntimeSkill(SpaceSO, SLevel);
-        LCtrl = CreateRuntimeSkill(LCtrlSO, LCtrlLevel);
+        LeftClick = CreateRuntimeSkill(LeftClickSO, 1, opponentMask);
+        RightClick = CreateRuntimeSkill(RightClickSO, RCLevel, opponentMask);
+        QSkill = CreateRuntimeSkill(QSkillSO, QLevel, opponentMask);
+        ESkill = CreateRuntimeSkill(ESkillSO, ELevel, opponentMask);
+        LShift = CreateRuntimeSkill(LShiftSO, LSLevel, opponentMask);
+        Space = CreateRuntimeSkill(SpaceSO, SLevel, opponentMask);
+        LCtrl = CreateRuntimeSkill(LCtrlSO, LCtrlLevel, opponentMask);
 
         skillDict.Clear();
         skillDict["LClick"] = LeftClick;
@@ -68,13 +70,14 @@ public class SkillsetBase : ScriptableObject
         LCtrl = null;
     }
 
-    private static Skill CreateRuntimeSkill(Skill definition, int investedPoints)
+    private static Skill CreateRuntimeSkill(Skill definition, int investedPoints, LayerMask opponentMask)
     {
         if (definition == null || investedPoints <= 0)
             return null;
 
         Skill runtime = Instantiate(definition);
         runtime.skillLevel = Mathf.Clamp(investedPoints, 1, 5);
+        runtime.targetMask = opponentMask;
         runtime.init();
         return runtime;
     }
